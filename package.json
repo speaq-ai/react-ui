@@ -25,7 +25,8 @@
 		"webpack-dev-server": "^3.8.0"
 	},
 	"scripts": {
-		"start": "webpack-dev-server --mode development"
+		"start": "webpack-dev-server --mode development",
+		"build": "webpack"
 	},
 	"resolutions": {
 		"deck.gl": "7.1.5"
