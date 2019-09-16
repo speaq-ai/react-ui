@@ -15,7 +15,9 @@ export async function login(username, password) {
 		});
 	} catch (e) {
 		console.error(e);
+		return false;
 	}
+	return true;
 }
 
 export async function logout() {

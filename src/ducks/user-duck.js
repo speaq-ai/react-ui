@@ -18,10 +18,12 @@ const initialState = {
 
 // action creators
 export async function login(username, password) {
-	const res = await loginUser(username, password);
-	return {
-		type: ACTION_TYPES.LOGIN,
-	};
+	const success = await loginUser(username, password);
+	return success
+		? {
+				type: ACTION_TYPES.LOGIN,
+		  }
+		: { type: ACTION_TYPES.LOGIN, error: "Incorrect email/password" };
 }
 
 export async function logout() {
