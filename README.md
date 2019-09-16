@@ -1,4 +1,4 @@
-# Speaq-AI Mockup
+# Speaq-AI Mockup [![Build Status](https://travis-ci.org/speaq-ai/react-ui.svg?branch=master)](https://travis-ci.org/speaq-ai/react-ui)
 
 ## Setup
 
