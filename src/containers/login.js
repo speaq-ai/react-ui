@@ -1,24 +1,24 @@
 import React, { Component } from "react";
+import Login from "@/components/login";
 import { connect } from "react-redux";
-import Visualizer from "@/components/visualizer";
 import * as userActions from "@/ducks/user-duck";
-class VisualizerContainer extends Component {
+class LoginContainer extends Component {
 	render() {
-		return (
-			<div>
-				<Visualizer {...this.props} />
-			</div>
-		);
+		return <Login {...this.props} />;
 	}
 }
 
-const mapStateToProps = state => state;
-
+function mapStateToProps(state) {
+	return {
+		authenticated: state.user.authenticated,
+	};
+}
 const mapDispatchToProps = {
+	login: userActions.login,
 	logout: userActions.logout,
 };
 
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(VisualizerContainer);
+)(LoginContainer);
