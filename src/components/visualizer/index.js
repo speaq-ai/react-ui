@@ -50,7 +50,7 @@ export default class Visualizer extends Component {
 		e.preventDefault();
 		const res = await sendMessage(this.state.inputText);
 		const responses = this.state.responses.concat(
-			res.output.generic[0] ? res.output.generic[0].text : "no response..."
+			res.text ? res.text : "no response..."
 		);
 		this.setState({ responses });
 	};
