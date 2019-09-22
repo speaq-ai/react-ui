@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { HashRouter as Router, Route, Link } from "react-router-dom";
+import { HashRouter as Router, Route, Link, Redirect } from "react-router-dom";
 import PrivateRoute from "@/components/login/private-route";
 import { connect } from "react-redux";
 import LoginContainer from "@/containers/login";
@@ -23,6 +23,18 @@ class App extends Component {
 							path="/dashboard"
 							authenticated={authenticated}
 							component={VisualizerContainer}
+						/>
+						<Route
+							path="/"
+							exact
+							render={props => (
+								<Redirect
+									to={{
+										pathname: "/dashboard",
+										state: { from: props.location },
+									}}
+								/>
+							)}
 						/>
 					</Router>
 				)}
