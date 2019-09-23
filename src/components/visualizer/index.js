@@ -13,7 +13,8 @@ const MainContainer = styled.div`
 	display: grid;
 	height: 100vh;
 	grid-template-columns: repeat(12, 1fr);
-	grid-template-rows: 30px auto;
+	grid-template-rows: min-content auto;
+	background-color: #29323C;
 `;
 
 const MapContainer = styled.div`
@@ -25,13 +26,21 @@ const ChatContainer = styled.div`
 	height: 100%;
 `;
 
-const LogoutButton = styled.button`
-	padding: 5px 10px;
-	border-radius: 3px;
-	background-color: red;
+const LogoutButton = styled.a`
+	grid-column: 12 / 13;
+	align-self: center;
+	justify-self: center;
 	color: white;
-	font-size: 0.6rem;
-	display: block;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	padding: .25em 1em;
+	margin: .5em;
+	background-color: #FF4136;
+	border-radius: 4px;
+	border: 2px solid #FF4136;
+
+	&:hover {
+		cursor: pointer
+	}
 `;
 
 export default class Visualizer extends Component {
