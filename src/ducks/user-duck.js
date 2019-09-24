@@ -5,7 +5,7 @@ import {
 	checkSession as checkUserSession,
 } from "@/utils/speaq-api";
 
-const ACTION_TYPES = {
+export const ACTION_TYPES = {
 	LOGIN: Symbol("USER/LOGIN"),
 	LOGIN_ERROR: Symbol("USER/LOGIN_ERROR"),
 	LOGOUT: Symbol("USER/LOGOUT"),
