@@ -31,6 +31,11 @@ const LoginInput = styled.input`
 	margin-bottom: 8px;
 `;
 
+const LoginError = styled.p`
+	color: red;
+	font-size: 0.8rem;
+`;
+
 export default class Login extends Component {
 	state = {
 		username: {
@@ -44,9 +49,10 @@ export default class Login extends Component {
 	};
 	_handleSubmit = async e => {
 		e.preventDefault();
-		const { login, history, authenticated } = this.props;
+		const { login, history } = this.props;
 		const { username, password } = this.state;
-		await login(username.value, password.value);
+		const res = await login(username.value, password.value);
+		history.push("/dashboard");
 	};
 
 	componentDidUpdate(prevProps) {
@@ -62,6 +68,7 @@ export default class Login extends Component {
 		this.setState({ [fieldName]: { ...this.state[fieldName], value } });
 	};
 	render() {
+		const { loginError } = this.props;
 		const { username, password } = this.state;
 		return (
 			<LoginContainer onSubmit={this._handleSubmit}>
@@ -85,6 +92,7 @@ export default class Login extends Component {
 					name="password"
 					id="password"
 				/>
+				{loginError && <LoginError>{loginError}</LoginError>}
 				<LoginButton onClick={this._handleSubmit}>login</LoginButton>
 			</LoginContainer>
 		);
