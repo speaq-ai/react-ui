@@ -69,7 +69,8 @@ export class Chat extends Component {
 
     state = {
         inputText: "",
-        responses: []
+        responses: [],
+        nextDatasetId: 0
     };
 
     constructor(props) {
@@ -110,11 +111,17 @@ export class Chat extends Component {
      * We can refactor this in the future to somewhere that makes more sense, but for the MVP...
      */
     _addFilter(field, value, comparator) {
-      // TODO
+      //https://github.com/keplergl/kepler.gl/blob/master/docs/api-reference/actions/actions.md#addfilter
+      // then
+      //https://github.com/keplergl/kepler.gl/blob/master/docs/api-reference/actions/actions.md#setfilter
     };
 
     _clearDatasets() {
+      for (int i = 0; i < this.state.nextDatasetId; i++ ) {
+        // call this function https://github.com/keplergl/kepler.gl/blob/master/docs/api-reference/actions/actions.md#removedataset
+      }
 
+      this.setState({ nextDatasetId: this.state.nextDatasetId })
     };
 
     _loadDataset(datasetName) {
@@ -129,13 +136,15 @@ export class Chat extends Component {
 						{
 							info: {
 								label: datasetName,
-								id: datasetName,
+								id: this.state.nextDatasetId,
 							},
 							data: processCsvData(data),
 						},
 					],
 				})
 			);
+
+      this.setState({ nextDatasetId: this.state.nextDatasetId + 1 })
     };
 
     _renderResponses() {
