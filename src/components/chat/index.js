@@ -70,9 +70,8 @@ export class Chat extends Component {
 
     _sendMessage = async e => {
         e.preventDefault();
-        this.setState({responses: [...this.state.responses, '...']})
+        this.setState({inputText: "", responses: [...this.state.responses, '...']})
         const res = await sendMessage(this.state.inputText);
-        this.state.inputText = ''
         this.setState({responses: this.state.responses.slice(0, -1)})
         const responses = this.state.responses.concat(
             res.output.generic[0] ? res.output.generic[0].text : "no response..."
