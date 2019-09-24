@@ -6,89 +6,72 @@ import { processCsvData } from "kepler.gl/processors";
 import store from "@/ducks";
 import { sendMessage } from "@/utils/speaq-api";
 import styled from "styled-components";
+import { Chat } from "@/components/chat";
+import { AutoSizer } from "react-virtualized"
 
-const LogoutButton = styled.button`
-	padding: 5px 10px;
-	border-radius: 3px;
-	background-color: red;
+const MainContainer = styled.div`
+	display: grid;
+	height: 100vh;
+	grid-template-columns: repeat(12, 1fr);
+	grid-template-rows: min-content auto;
+	background-color: #29323C;
+`;
+
+const MapContainer = styled.div`
+	grid-column: 3 / 13;
+`;
+
+const ChatContainer = styled.div`
+	grid-column: 1 / 3;
+	height: 100%;
+`;
+
+const LogoutButton = styled.a`
+	grid-column: 12 / 13;
+	align-self: center;
+	justify-self: center;
 	color: white;
-	font-size: 0.6rem;
-	display: block;
-`;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	padding: .25em 1em;
+	margin: .5em;
+	background-color: #FF4136;
+	border-radius: 4px;
+	border: 2px solid #FF4136;
 
-const MessageInput = styled.input`
-	padding: 5px 10px;
-	border-radius: 3px;
-	outline: none;
-	border: 1px solid gray;
-	border-right: none;
-	font-size: 1rem;
-	color: black;
-	background-color: white;
-	margin-bottom: 8px;
-`;
-const MessageButton = styled.button`
-	padding: 5px 10px;
-	border-radius: 3px;
-	outline: none;
-	border: 1px solid gray;
-	color: black;
-	background-color lightgray;
-	font-size: 0.6rem;
+	&:hover {
+		cursor: pointer
+	}
 `;
 
 export default class Visualizer extends Component {
-	state = {
-		inputText: "",
-		responses: [],
-	};
 	constructor(props) {
 		super(props);
 	}
 
-	_sendMessage = async e => {
-		e.preventDefault();
-		const res = await sendMessage(this.state.inputText);
-		const responses = this.state.responses.concat(
-			res.output.generic[0] ? res.output.generic[0].text : "no response..."
-		);
-		this.setState({ responses });
-	};
-
-	_renderResponses() {
-		return this.state.responses.map((response, i) => <p key={i}>{response}</p>);
-	}
-
 	render() {
-		const width = window.innerWidth;
-		const height = window.innerHeight;
 		const mapboxAccessToken = process.env.MAPBOX_ACCESS_TOKEN;
 		const { logout } = this.props;
-		const { inputText } = this.state;
 
 		return (
-			<div>
+			<MainContainer>
 				<LogoutButton onClick={logout}>Logout</LogoutButton>
-				<form onSubmit={this._sendMessage}>
-					<h4 htmlFor="">Message Watson Here!</h4>
-					<MessageInput
-						type="text"
-						value={inputText}
-						onChange={e => this.setState({ inputText: e.target.value })}
-					/>
-					<MessageButton type="submit" onClick={this._sendMessage}>
-						Send
-					</MessageButton>
-					{this._renderResponses()}
-				</form>
-				<KeplerGl
-					id="foo"
-					store={store}
-					mapboxApiAccessToken={mapboxAccessToken}
-					width={width}
-					height={height}
-				/>
-			</div>
+				<ChatContainer>
+					<Chat />
+				</ChatContainer>
+				<MapContainer>
+					<AutoSizer>
+						{({height, width}) => (
+							<KeplerGl
+							id="foo"
+							store={store}
+							mapboxApiAccessToken={mapboxAccessToken}
+							width={width}
+							height={height}
+						/>
+						)}
+					</AutoSizer>
+				</MapContainer>
+			</MainContainer>
 		);
 	}
 }
