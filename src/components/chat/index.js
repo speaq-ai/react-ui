@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { sendMessage } from "@/utils/speaq-api";
+import { addDataToMap } from "kepler.gl/actions";
+import { processCsvData } from "kepler.gl/processors";
 
 const ChatContainer = styled.div`
     display: flex;
@@ -59,6 +61,12 @@ const Response = styled.p`
 `;
 
 export class Chat extends Component {
+    ActionKeys = {
+      AddFilter = "AddFilter",
+      LoadDataset = "LoadData",
+      Clear = "Clear"
+    }
+
     state = {
         inputText: "",
         responses: []
@@ -77,6 +85,57 @@ export class Chat extends Component {
             res.text ? res.text : "no response..."
         );
         this.setState({ responses });
+
+        switch (res.action) {
+          case null:
+            // do nothing
+            break;
+
+          case this.ActionKeys.AddFilter:
+            this._addFilter(res.variables.FilterField, res.variables.Number, res.variables.FilterComparison);
+            break;
+
+          case this.ActionKeys.LoadDataset:
+            this._loadDataset(res.variables.DatasetName);
+            break;
+
+          case this.ActionKeys.Clear:
+            this._clearDatasets();
+            break;
+        }
+    };
+
+    /*
+     * Taking actions below.
+     * We can refactor this in the future to somewhere that makes more sense, but for the MVP...
+     */
+    _addFilter(field, value, comparator) {
+      // TODO
+    };
+
+    _clearDatasets() {
+
+    };
+
+    _loadDataset(datasetName) {
+      // @ Jamie - once we have our datasets loaded, we have to match the entity given by watson to the
+      // proper actual dataset that we have.
+
+      data = 0; // TODO: resolve the dataset name to the actual imported csv data here
+
+			this.props.dispatch(
+				addDataToMap({
+					datasets: [
+						{
+							info: {
+								label: datasetName,
+								id: datasetName,
+							},
+							data: processCsvData(data),
+						},
+					],
+				})
+			);
     };
 
     _renderResponses() {
