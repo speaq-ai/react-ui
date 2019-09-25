@@ -6,7 +6,7 @@ jest.mock('axios');
 describe('speaq-api', () => {
     describe('login', () => {
         it('Should return true if the request is resolved without error', async () => {
-            axios.post.mockResolvedValue({});
+            axios.post.mockResolvedValue({status: 200, data: ''});
             const result = await login('username', 'password');
 
             expect(result).toEqual(true);
@@ -20,6 +20,17 @@ describe('speaq-api', () => {
             
             expect(console.error).toHaveBeenCalled();
             expect(result).toEqual(false);
+        });
+    });
+
+    describe('logout', () => {
+        it('Should error if the request throws an error', async () => {
+            axios.post.mockImplementation(() => {throw new Error()})
+            console.error = jest.fn();
+
+            const result = await logout();
+            
+            expect(console.error).toHaveBeenCalled();
         });
     });
 });
