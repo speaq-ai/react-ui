@@ -29,7 +29,7 @@ describe('User Duck', () => {
         expect(result).toEqual(response)
     });
 
-    it('Should log out successfully', async () => {
+    it('Should return logout action type', async () => {
         const response = {
             type: ACTION_TYPES.LOGOUT,
         }
