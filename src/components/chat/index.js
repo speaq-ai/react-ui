@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { sendMessage } from "@/utils/speaq-api";
 import { addDataToMap } from "kepler.gl/actions";
 import { processCsvData } from "kepler.gl/processors";
+import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 
 const ChatContainer = styled.div`
     display: flex;
@@ -62,9 +63,9 @@ const Response = styled.p`
 
 export class Chat extends Component {
     ActionKeys = {
-      AddFilter = "AddFilter",
-      LoadDataset = "LoadData",
-      Clear = "Clear"
+      AddFilter: "AddFilter",
+      LoadDataset: "LoadData",
+      Clear: "Clear"
     }
 
     state = {
@@ -117,7 +118,8 @@ export class Chat extends Component {
     };
 
     _clearDatasets() {
-      for (int i = 0; i < this.state.nextDatasetId; i++ ) {
+      var i;
+      for (i = 0; i < this.state.nextDatasetId; i++ ) {
         // call this function https://github.com/keplergl/kepler.gl/blob/master/docs/api-reference/actions/actions.md#removedataset
       }
 
@@ -125,10 +127,7 @@ export class Chat extends Component {
     };
 
     _loadDataset(datasetName) {
-      // @ Jamie - once we have our datasets loaded, we have to match the entity given by watson to the
-      // proper actual dataset that we have.
-
-      data = 0; // TODO: resolve the dataset name to the actual imported csv data here
+      var data = this._resolveDataset(datasetName);
 
 			this.props.dispatch(
 				addDataToMap({
@@ -144,8 +143,16 @@ export class Chat extends Component {
 				})
 			);
 
-      this.setState({ nextDatasetId: this.state.nextDatasetId + 1 })
+      this.setState({ nextDatasetId: this.state.nextDatasetId + 1 });
     };
+
+    _resolveDataset(datasetName) {
+      // TODO
+      // @ Jamie - once we have our datasets loaded, we have to match the entity given by watson to the
+      // proper actual dataset that we have.
+
+      return sacramentoRealEstate;
+    }
 
     _renderResponses() {
         return this.state.responses.map((response, i) => <Response key={i}>{response}</Response>);
