@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { sendMessage } from "@/utils/speaq-api";
-import { addDataToMap } from "kepler.gl/actions";
 import { processCsvData } from "kepler.gl/processors";
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 
@@ -94,11 +93,11 @@ export class Chat extends Component {
             break;
 
           case this.ActionKeys.AddFilter:
-            this._addFilter(res.variables.FilterField, res.variables.Number, res.variables.FilterComparison);
+            this._addFilter(res.variables.filter_field, res.variables.sys_number, res.variables.filter_comparison);
             break;
 
           case this.ActionKeys.LoadDataset:
-            this._loadDataset(res.variables.DatasetName);
+            this._loadDataset(res.variables.dataset_name);
             break;
 
           case this.ActionKeys.Clear:
@@ -120,31 +119,28 @@ export class Chat extends Component {
     _clearDatasets() {
       var i;
       for (i = 0; i < this.state.nextDatasetId; i++ ) {
+        // don't forget to cast nextDatasetId to a string!
         // call this function https://github.com/keplergl/kepler.gl/blob/master/docs/api-reference/actions/actions.md#removedataset
       }
 
-      this.setState({ nextDatasetId: this.state.nextDatasetId })
+      this.setState({ nextDatasetId: 0 })
     };
 
     _loadDataset(datasetName) {
       var data = this._resolveDataset(datasetName);
 
-			this.props.dispatch(
-				addDataToMap({
-					datasets: [
-						{
-							info: {
-								label: datasetName,
-								id: this.state.nextDatasetId,
-							},
-							data: processCsvData(data),
+		  this.props.addDataToMap({
+				datasets: [
+					{
+						info: {
+							label: datasetName,
+							id: "" + this.state.nextDatasetId,
 						},
-					],
-				})
-			);
-
-      this.setState({ nextDatasetId: this.state.nextDatasetId + 1 });
-    };
+						data: processCsvData(data),
+					},
+				],
+			});
+    }
 
     _resolveDataset(datasetName) {
       // TODO

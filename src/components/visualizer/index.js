@@ -56,7 +56,7 @@ export default class Visualizer extends Component {
 			<MainContainer>
 				<LogoutButton onClick={logout}>Logout</LogoutButton>
 				<ChatContainer>
-					<Chat />
+					<Chat {...this.props }/>
 				</ChatContainer>
 				<MapContainer>
 					<AutoSizer>
