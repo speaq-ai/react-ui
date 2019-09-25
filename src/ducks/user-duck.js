@@ -47,18 +47,13 @@ export default function reducer(state = initialState, action = {}) {
 	switch (action.type) {
 		case ACTION_TYPES.LOGIN:
 			return { ...state, authenticated: true, loginError: null };
-			break;
 		case ACTION_TYPES.LOGIN_ERROR:
 			return { ...state, authenticated: false, loginError: action.error };
-			break;
 		case ACTION_TYPES.LOGOUT:
 			return { ...state, authenticated: false };
-			break;
 		case ACTION_TYPES.CHECK_SESSION:
 			return { ...state, authenticated: action.authenticated };
-			break;
 		default:
 			return { ...state };
-			break;
 	}
 }
