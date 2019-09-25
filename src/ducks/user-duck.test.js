@@ -4,29 +4,32 @@ import { login as apiLogin, logout as apiLogout, checkSession as apiCheckSession
 jest.mock('@/utils/speaq-api')  // Automock speaq-api methods, define implmentation in tests
 
 describe('User Duck', () => {
-    it('Should return login action type when provided valid credentials', async () => {
-        const username = 'user';
-        const password = 'password';
-        const response = {
-            type: ACTION_TYPES.LOGIN
-        }
 
-        apiLogin.mockImplementation(() => true);
-        const result = await login(username, password);
-        expect(result).toEqual(response)
-    });
-
-    it('Should return login error action type when provided invalid credentials', async () => {
-        const username = 'user';
-        const password = 'password';
-        const response = {
-            error: "Incorrect email/password",
-            type: ACTION_TYPES.LOGIN_ERROR
-        }
-
-        apiLogin.mockImplementation(() => false);
-        const result = await login(username, password);
-        expect(result).toEqual(response)
+    describe('Login', () => {
+        it('Should return login action type when provided valid credentials', async () => {
+            const username = 'user';
+            const password = 'password';
+            const response = {
+                type: ACTION_TYPES.LOGIN
+            }
+    
+            apiLogin.mockImplementation(() => true);
+            const result = await login(username, password);
+            expect(result).toEqual(response)
+        });
+    
+        it('Should return login error action type when provided invalid credentials', async () => {
+            const username = 'user';
+            const password = 'password';
+            const response = {
+                error: "Incorrect email/password",
+                type: ACTION_TYPES.LOGIN_ERROR
+            }
+    
+            apiLogin.mockImplementation(() => false);
+            const result = await login(username, password);
+            expect(result).toEqual(response)
+        });
     });
 
     it('Should return logout action type', async () => {
