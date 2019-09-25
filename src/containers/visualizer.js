@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import Visualizer from "@/components/visualizer";
-import { addDataToMap } from "kepler.gl/actions";
+import { addDataToMap, removeDataset } from "kepler.gl/actions";
 import * as userActions from "@/ducks/user-duck";
 class VisualizerContainer extends Component {
 	render() {
@@ -17,7 +17,8 @@ const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
 	logout: userActions.logout,
-	addDataToMap
+	addDataToMap,
+	removeDataset
 };
 
 export default connect(

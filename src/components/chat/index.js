@@ -119,8 +119,7 @@ export class Chat extends Component {
     _clearDatasets() {
       var i;
       for (i = 0; i < this.state.nextDatasetId; i++ ) {
-        // don't forget to cast nextDatasetId to a string!
-        // call this function https://github.com/keplergl/kepler.gl/blob/master/docs/api-reference/actions/actions.md#removedataset
+        this.props.removeDataset("" + i)
       }
 
       this.setState({ nextDatasetId: 0 })
@@ -140,6 +139,8 @@ export class Chat extends Component {
 					},
 				],
 			});
+
+      this.setState({ nextDatasetId: this.state.nextDatasetId + 1 })
     }
 
     _resolveDataset(datasetName) {
