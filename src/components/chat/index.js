@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { sendMessage } from "@/utils/speaq-api";
 
-const ChatContainer = styled.div`
+export const ChatContainer = styled.div`
     display: flex;
     flex-direction: column;
     background-color: #242730;
@@ -11,7 +11,7 @@ const ChatContainer = styled.div`
     height: 100%;
 `;
 
-const MessageInput = styled.input`
+export const MessageInput = styled.input`
 	padding: 5px 10px;
 	border-radius: 3px;
 	outline: none;
@@ -23,7 +23,7 @@ const MessageInput = styled.input`
     width: 75%;
 `;
 
-const MessageButton = styled.button`
+export const MessageButton = styled.button`
 	padding: 5px 10px;
 	border-radius: 3px;
 	outline: none;
@@ -33,17 +33,17 @@ const MessageButton = styled.button`
 	font-size: 0.6rem;
 `;
 
-const ResponseContainer = styled.div`
+export const ResponseContainer = styled.div`
     height: 100%;
 `;
 
-const ChatTitle = styled.h3`
+export const ChatTitle = styled.h3`
     background-color: #29323C;
     margin: 0;
     padding: 1em;
 `;
 
-const MessageForm = styled.form`
+export const MessageForm = styled.form`
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -52,7 +52,7 @@ const MessageForm = styled.form`
     background-color: #29323C;
 `;
 
-const Response = styled.p`
+export const Response = styled.p`
     margin: 0;
     padding: 1em;
     border-bottom: 1px solid white;
