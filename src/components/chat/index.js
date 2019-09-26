@@ -215,7 +215,7 @@ export class Chat extends Component {
 
   _resolveDataset(datasetName) {
     var datasetMap = {
-      "Columbus traffic accident": columbusTraffic,
+      "Earthquake": earthquake,
       "Sacremento real estate": sacrementoRealEstate
     };
 
