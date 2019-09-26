@@ -141,13 +141,13 @@ export class Chat extends Component {
     await setFilter(filterId, "name", this._resolveField(field));
 
     switch (comparator) {
-      case "gt": // Jamie TODO make this strings the literals we're expecting from watson for our script
+      case "greater than":
         await this._setGtFilter(filterId, value);
         break;
-      case "lt":
+      case "less than":
         await this._setLtFilter(filterId, value);
         break;
-      case "eq":
+      case "equal":
         await this._setEqFilter(filterId, value);
         break;
       default:
@@ -175,7 +175,7 @@ export class Chat extends Component {
 
   _resolveField(field) {
     // Jamie todo here - return the proper string seen as column titles in the dataset from the literal from watson
-    return "beds";
+    return field;
   }
 
   _clearDatasets() {
@@ -210,7 +210,11 @@ export class Chat extends Component {
     // @ Jamie - once we have our datasets loaded, we have to match the entity given by watson to the
     // proper actual dataset that we have.
 
-    return sacramentoRealEstate;
+    if (datasetName == 'Columbus traffic') {
+      return sacramentoRealEstate;
+    } else {
+      return sacramentoRealEstate;
+    }
   }
 
   _renderResponses() {
