@@ -60,4 +60,23 @@ describe('speaq-api', () => {
             expect(console.error).toHaveBeenCalled();
         });
     });
+
+    describe('sendMessage', () => {
+        it('Should respond with JSON object when passed a message', async () => {
+            axios.post.mockResolvedValue({status: 200, data: '{}'});
+
+            const response = await sendMessage('');
+
+            expect(typeof response).toBe('object');
+        });
+
+        it('Should log error if request throws an error', async () => {
+            axios.post.mockImplementation(() => {throw new Error()});
+            console.error = jest.fn();
+
+            await sendMessage('');
+
+            expect(console.error).toHaveBeenCalled();
+        });
+    });
 });
