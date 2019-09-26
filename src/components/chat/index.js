@@ -178,7 +178,7 @@ export class Chat extends Component {
     var fieldMap = {
       "price": "price",
       "NumberOfUnits": "NumberOfUnits"
-    }
+    };
     return fieldMap[field];
   }
 
@@ -212,8 +212,8 @@ export class Chat extends Component {
   _resolveDataset(datasetName) {
     var datasetMap = {
       "Columbus traffic accident": columbusTraffic,
-      "Sacremento real estate": sacrementoRealEstate;
-    }
+      "Sacremento real estate": sacrementoRealEstate
+    };
 
     return datasetMap[datasetName];
   }
