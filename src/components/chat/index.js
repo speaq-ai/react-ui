@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { sendMessage } from "@/utils/speaq-api";
 import { processCsvData } from "kepler.gl/processors";
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
+import columbusTraffic from "../../data/ColumbusTraffic";
 
 const ChatContainer = styled.div`
   display: flex;
@@ -174,8 +175,11 @@ export class Chat extends Component {
   }
 
   _resolveField(field) {
-    // Jamie todo here - return the proper string seen as column titles in the dataset from the literal from watson
-    return field;
+    var fieldMap = {
+      "price": "price",
+      "NumberOfUnits": "NumberOfUnits"
+    }
+    return fieldMap[field];
   }
 
   _clearDatasets() {
@@ -206,15 +210,12 @@ export class Chat extends Component {
   }
 
   _resolveDataset(datasetName) {
-    // TODO
-    // @ Jamie - once we have our datasets loaded, we have to match the entity given by watson to the
-    // proper actual dataset that we have.
-
-    if (datasetName == 'Columbus traffic') {
-      return sacramentoRealEstate;
-    } else {
-      return sacramentoRealEstate;
+    var datasetMap = {
+      "Columbus traffic accident": columbusTraffic,
+      "Sacremento real estate": sacrementoRealEstate;
     }
+
+    return datasetMap[datasetName];
   }
 
   _renderResponses() {
