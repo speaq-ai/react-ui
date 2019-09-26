@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { sendMessage } from "@/utils/speaq-api";
 import { processCsvData } from "kepler.gl/processors";
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
-import columbusTraffic from "../../data/ColumbusTraffic";
+import earthquake from "../../data/Earthquake";
 
 const ChatContainer = styled.div`
   display: flex;
@@ -177,7 +177,11 @@ export class Chat extends Component {
   _resolveField(field) {
     var fieldMap = {
       "price": "price",
-      "NumberOfUnits": "NumberOfUnits"
+      "beds": "beds",
+      "baths": "baths",
+      "year": "year",
+      "magnitude": "magnitude",
+      "depth": "depth"
     };
     return fieldMap[field];
   }
