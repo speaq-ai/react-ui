@@ -97,7 +97,6 @@ export class Chat extends Component {
         break;
 
       case this.ActionKeys.AddFilter:
-        console.log(res.variables);
         this._addFilter(
           res.variables.filter_field,
           res.variables.sys_number,
@@ -132,16 +131,17 @@ export class Chat extends Component {
    * most recently loaded dataset ID.
    */
   async _addFilter(field, value, comparator, dataset) {
-    const { nextDatasetId } = this.state;
     const { addFilter, setFilter, keplerGl } = this.props;
     const { visState } = keplerGl.foo;
     const datasetId = dataset || Object.values(visState.datasets)[0].id;
     const filterId = visState.filters.length;
+
     await addFilter(datasetId);
     // get the ID of the filter we just added
-    await setFilter(filterId, "name", field);
+    await setFilter(filterId, "name", this._resolveField(field));
+
     switch (comparator) {
-      case "gt":
+      case "gt": // Jamie TODO make this strings the literals we're expecting from watson for our script
         await this._setGtFilter(filterId, value);
         break;
       case "lt":
@@ -152,6 +152,8 @@ export class Chat extends Component {
         break;
       default:
         // do nothing
+        // TODO: change this in the future. For our MVP demo, we can default to less than
+        await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
         break;
     }
   }
@@ -169,6 +171,11 @@ export class Chat extends Component {
   async _setEqFilter(filterId, value) {
     const { setFilter } = this.props;
     await setFilter(filterId, "value", [value, value]);
+  }
+
+  _resolveField(field) {
+    // Jamie todo here - return the proper string seen as column titles in the dataset from the literal from watson
+    return "beds";
   }
 
   _clearDatasets() {
