@@ -4,6 +4,7 @@ import { taskMiddleware } from "react-palm/tasks";
 import promiseMiddleware from "redux-promise";
 
 import userReducer, { initialState as userState } from "./user-duck";
+import logger from "redux-logger";
 
 const reducer = combineReducers({
 	// <-- mount kepler.gl reducer in your app
@@ -17,5 +18,5 @@ const reducer = combineReducers({
 export default createStore(
 	reducer,
 	{},
-	applyMiddleware(taskMiddleware, promiseMiddleware)
+	applyMiddleware(logger, taskMiddleware, promiseMiddleware)
 );
