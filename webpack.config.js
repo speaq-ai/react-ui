@@ -13,7 +13,7 @@ module.exports = {
 		contentBase: "./", // where dev server should serve content from
 		publicPath: "/dist/",
 	},
-	devtool: "inline-source-map",
+	devtool: "source-map",
 	plugins: [new Dotenv()],
 	module: {
 		// defining the actual behavior the webpack bundler

@@ -1,0 +1,521 @@
+
+{
+  "header": {
+    "reportVersion": 1,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20190926.133649.20016.0.001.json",
+    "dumpEventTime": "2019-09-26T13:36:49Z",
+    "dumpEventTimeStamp": "1569519409142",
+    "processId": 20016,
+    "cwd": "/home/jcunningham/code/osu/au19/capstone/react-ui",
+    "commandLine": [
+      "/usr/bin/node",
+      "/home/jcunningham/code/osu/au19/capstone/react-ui/node_modules/.bin/webpack-dev-server",
+      "--mode",
+      "development"
+    ],
+    "nodejsVersion": "v12.8.1",
+    "glibcVersionRuntime": "2.27",
+    "glibcVersionCompiler": "2.17",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "linux",
+    "componentVersions": {
+      "node": "12.8.1",
+      "v8": "7.5.288.22-node.16",
+      "uv": "1.30.1",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "72",
+      "nghttp2": "1.39.2",
+      "napi": "4",
+      "llhttp": "1.1.4",
+      "http_parser": "2.8.0",
+      "openssl": "1.1.1c",
+      "cldr": "35.1",
+      "icu": "64.2",
+      "tz": "2019a",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v12.8.1/node-v12.8.1-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.8.1/node-v12.8.1.tar.gz"
+    },
+    "osName": "Linux",
+    "osRelease": "4.15.0-55-generic",
+    "osVersion": "#60-Ubuntu SMP Tue Jul 2 18:22:20 UTC 2019",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4168,
+        "user": 284785000,
+        "nice": 725100,
+        "sys": 154382700,
+        "idle": 29826409200,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4099,
+        "user": 214917000,
+        "nice": 728400,
+        "sys": 217089900,
+        "idle": 29755456000,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4114,
+        "user": 250107800,
+        "nice": 676700,
+        "sys": 115167300,
+        "idle": 29909268600,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4061,
+        "user": 241806500,
+        "nice": 635000,
+        "sys": 117682000,
+        "idle": 29915948700,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4130,
+        "user": 249784300,
+        "nice": 795400,
+        "sys": 118787400,
+        "idle": 29907084200,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4049,
+        "user": 261843100,
+        "nice": 688600,
+        "sys": 117161800,
+        "idle": 29897090900,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4162,
+        "user": 276741600,
+        "nice": 663600,
+        "sys": 146897200,
+        "idle": 29837447700,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4162,
+        "user": 286768000,
+        "nice": 667000,
+        "sys": 146144000,
+        "idle": 29839024400,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4169,
+        "user": 249509900,
+        "nice": 751400,
+        "sys": 125692000,
+        "idle": 29901815400,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4053,
+        "user": 237808200,
+        "nice": 667800,
+        "sys": 120950900,
+        "idle": 29918421800,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4092,
+        "user": 239648200,
+        "nice": 699300,
+        "sys": 122733800,
+        "idle": 29912841800,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Xeon(R) E-2176M  CPU @ 2.70GHz",
+        "speed": 4138,
+        "user": 249300500,
+        "nice": 743800,
+        "sys": 116901300,
+        "idle": 29911300400,
+        "irq": 0
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "lo",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "127.0.0.1",
+        "netmask": "255.0.0.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "wlp111s0",
+        "internal": false,
+        "mac": "a8:6d:aa:2b:63:21",
+        "address": "172.28.35.168",
+        "netmask": "255.255.240.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "lo",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "::1",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "wlp111s0",
+        "internal": false,
+        "mac": "a8:6d:aa:2b:63:21",
+        "address": "fe80::5982:3a3:281:b4c4",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 3
+      }
+    ],
+    "host": "jcarlet-Precision-7730"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x0000000000ad6c95",
+      "symbol": "report::TriggerNodeReport(v8::Isolate*, node::Environment*, char const*, char const*, std::string const&, v8::Local<v8::String>) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x00000000009b19f3",
+      "symbol": "node::OnFatalError(char const*, char const*) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b0ffde",
+      "symbol": "v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, bool) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b10359",
+      "symbol": "v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, bool) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000ced265",
+      "symbol": " [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000cf8aab",
+      "symbol": "v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::GCCallbackFlags) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000cf97c7",
+      "symbol": "v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000cfc2f8",
+      "symbol": "v8::internal::Heap::AllocateRawWithRetryOrFail(int, v8::internal::AllocationType, v8::internal::AllocationAlignment) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000cc5c07",
+      "symbol": "v8::internal::Factory::NewFillerObject(int, bool, v8::internal::AllocationType) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f9c7c8",
+      "symbol": "v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/usr/bin/node]"
+    },
+    {
+      "pc": "0x000000000131eb19",
+      "symbol": " [/usr/bin/node]"
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 2163056640,
+    "totalCommittedMemory": 2160374448,
+    "usedMemory": 2148858976,
+    "availableMemory": 45035200,
+    "memoryLimit": 2197815296,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 262144,
+        "committedMemory": 32272,
+        "capacity": 261832,
+        "used": 31960,
+        "available": 229872
+      },
+      "new_space": {
+        "memorySize": 7340032,
+        "committedMemory": 5380736,
+        "capacity": 3665648,
+        "used": 2160800,
+        "available": 1504848
+      },
+      "old_space": {
+        "memorySize": 1700409344,
+        "committedMemory": 1700110480,
+        "capacity": 1698165912,
+        "used": 1693289736,
+        "available": 4876176
+      },
+      "code_space": {
+        "memorySize": 1474560,
+        "committedMemory": 1281504,
+        "capacity": 1157504,
+        "used": 1157504,
+        "available": 0
+      },
+      "map_space": {
+        "memorySize": 3936256,
+        "committedMemory": 3935152,
+        "capacity": 2752560,
+        "used": 2752560,
+        "available": 0
+      },
+      "large_object_space": {
+        "memorySize": 449011712,
+        "committedMemory": 449011712,
+        "capacity": 448915856,
+        "used": 448915856,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 622592,
+        "committedMemory": 622592,
+        "capacity": 550560,
+        "used": 550560,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 3665648,
+        "used": 0,
+        "available": 3665648
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 103.381,
+    "kernelCpuSeconds": 4.41632,
+    "cpuConsumptionPercent": 7.50678,
+    "maxRss": 2636832768,
+    "pageFaults": {
+      "IORequired": 9,
+      "IONotRequired": 2363275
+    },
+    "fsActivity": {
+      "reads": 1992,
+      "writes": 24
+    }
+  },
+  "uvthreadResourceUsage": {
+    "userCpuSeconds": 55.7288,
+    "kernelCpuSeconds": 1.69482,
+    "cpuConsumptionPercent": 3.99886,
+    "fsActivity": {
+      "reads": 1992,
+      "writes": 24
+    }
+  },
+  "libuv": [
+  ],
+  "environmentVariables": {
+    "LESSOPEN": "| /usr/bin/lesspipe %s",
+    "npm_package_dependencies_prettier": "^1.18.2",
+    "CONDA_PROMPT_MODIFIER": "(base) ",
+    "USER": "jcunningham",
+    "LANGUAGE": "en_US",
+    "npm_package_dependencies__babel_preset_react": "^7.0.0",
+    "npm_config_version_commit_hooks": "true",
+    "npm_config_user_agent": "yarn/1.17.3 npm/? node/v12.8.1 linux x64",
+    "XDG_SEAT": "seat0",
+    "npm_config_bin_links": "true",
+    "SSH_AGENT_PID": "19391",
+    "XDG_SESSION_TYPE": "x11",
+    "npm_node_execpath": "/usr/bin/node",
+    "npm_package_dependencies__babel_core": "^7.5.5",
+    "npm_config_init_version": "1.0.0",
+    "DATA": "/data",
+    "SHLVL": "3",
+    "XDG_CACHE_HOME": "/home/jcunningham/snap/code/common/.cache",
+    "CONDA_SHLVL": "1",
+    "OLDPWD": "/home/jcunningham/code/osu/au19/capstone/api",
+    "HOME": "/home/jcunningham",
+    "DESKTOP_SESSION": "xubuntu",
+    "TERM_PROGRAM_VERSION": "1.38.1",
+    "npm_config_init_license": "MIT",
+    "APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL": "true",
+    "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",
+    "YARN_WRAP_OUTPUT": "false",
+    "npm_config_version_tag_prefix": "v",
+    "npm_package_dependencies_webpack": "^4.39.3",
+    "npm_package_dependencies_react_virtualized": "^9.21.1",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1001/bus",
+    "npm_package_dependencies_dotenv": "^8.1.0",
+    "COLORTERM": "truecolor",
+    "_CE_M": "",
+    "GLADE_MODULE_PATH": ":",
+    "npm_package_dependencies_webpack_dev_server": "^3.8.0",
+    "npm_package_dependencies_react_router_dom": "^5.0.1",
+    "npm_package_description": "AI capstone team speaq-ai mockup",
+    "npm_package_readmeFilename": "README.md",
+    "npm_package_dependencies_react_palm": "^3.1.2",
+    "MANDATORY_PATH": "/usr/share/gconf/xubuntu.mandatory.path",
+    "QT_QPA_PLATFORMTHEME": "gtk2",
+    "LOGNAME": "jcunningham",
+    "WINDOWID": "73400323",
+    "_": "/usr/bin/yarn",
+    "DEFAULTS_PATH": "/usr/share/gconf/xubuntu.default.path",
+    "npm_config_registry": "https://registry.yarnpkg.com",
+    "GTK_OVERLAY_SCROLLING": "0",
+    "XDG_SESSION_ID": "c2",
+    "CLUTTER_BACKEND": "x11",
+    "TERM": "xterm-256color",
+    "npm_package_dependencies_redux_logger": "^3.0.6",
+    "_CE_CONDA": "",
+    "npm_package_scripts_start": "webpack-dev-server --mode development",
+    "npm_config_ignore_scripts": "",
+    "npm_package_dependencies_dotenv_webpack": "^1.7.0",
+    "npm_package_dependencies_axios": "^0.19.0",
+    "PATH": "/tmp/yarn--1569517973064-0.8739499201291294:/home/jcunningham/code/osu/au19/capstone/react-ui/node_modules/.bin:/home/jcunningham/.config/yarn/link/node_modules/.bin:/home/jcunningham/.yarn/bin:/usr/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/lib/node_modules/npm/bin/node-gyp-bin:/usr/bin/node_modules/npm/bin/node-gyp-bin:/home/jcunningham/miniconda3/bin:/home/jcunningham/miniconda3/condabin:/home/jcunningham/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+    "NODE": "/usr/bin/node",
+    "GDM_LANG": "en_US",
+    "GLADE_PIXMAP_PATH": ":",
+    "SESSION_MANAGER": "local/jcarlet-Precision-7730:@/tmp/.ICE-unix/19409,unix/jcarlet-Precision-7730:/tmp/.ICE-unix/19409",
+    "npm_package_name": "mockup",
+    "XDG_MENU_PREFIX": "xfce-",
+    "XDG_RUNTIME_DIR": "/run/user/1001/snap.code",
+    "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session0",
+    "npm_package_dependencies_react_redux": "^7.1.1",
+    "DISPLAY": ":0.0",
+    "LANG": "en_US.UTF-8",
+    "XDG_CURRENT_DESKTOP": "XFCE",
+    "npm_package_dependencies_redux": "^4.0.4",
+    "npm_package_dependencies_react_dom": "^16.9.0",
+    "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:",
+    "TERM_PROGRAM": "vscode",
+    "XDG_SESSION_DESKTOP": "xubuntu",
+    "XAUTHORITY": "/home/jcunningham/.Xauthority",
+    "npm_lifecycle_script": "webpack-dev-server --mode development",
+    "npm_package_main": "index.js",
+    "SSH_AUTH_SOCK": "/run/user/1001/keyring/ssh",
+    "GLADE_CATALOG_PATH": ":",
+    "XDG_GREETER_DATA_DIR": "/var/lib/lightdm-data/jcunningham",
+    "CONDA_PYTHON_EXE": "/home/jcunningham/miniconda3/bin/python",
+    "GSETTINGS_SCHEMA_DIR": "/snap/code/15/usr/share/glib-2.0/schemas",
+    "npm_config_version_git_message": "v%s",
+    "DISABLE_WAYLAND": "1",
+    "SHELL": "/bin/bash",
+    "GDK_PIXBUF_MODULEDIR": "/snap/code/15/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders",
+    "npm_lifecycle_event": "start",
+    "npm_package_dependencies_webpack_cli": "^3.3.7",
+    "npm_package_version": "1.0.0",
+    "QT_ACCESSIBILITY": "1",
+    "GDMSESSION": "xubuntu",
+    "npm_config_argv": "{\"remain\":[],\"cooked\":[\"run\",\"start\"],\"original\":[\"start\"]}",
+    "npm_package_scripts_build": "webpack",
+    "npm_package_dependencies_redux_promise": "^0.6.0",
+    "LESSCLOSE": "/usr/bin/lesspipe %s %s",
+    "CODE": "/home/jcunningham/code",
+    "CONDA_DEFAULT_ENV": "base",
+    "npm_config_version_git_tag": "true",
+    "npm_config_version_git_sign": "",
+    "GDK_PIXBUF_MODULE_FILE": "/home/jcunningham/snap/code/common/.cache/gdk-pixbuf-loaders.cache",
+    "GPG_AGENT_INFO": "/run/user/1001/gnupg/S.gpg-agent:0:1",
+    "npm_package_dependencies_kepler_gl": "^1.1.3",
+    "npm_package_dependencies__babel_plugin_proposal_class_properties": "^7.5.5",
+    "npm_package_license": "MIT",
+    "npm_config_strict_ssl": "true",
+    "XDG_VTNR": "7",
+    "PWD": "/home/jcunningham/code/osu/au19/capstone/react-ui",
+    "npm_execpath": "/usr/share/yarn/bin/yarn.js",
+    "CONDA_EXE": "/home/jcunningham/miniconda3/bin/conda",
+    "XDG_DATA_DIRS": "/usr/share/xubuntu:/usr/share/xfce4:/usr/local/share:/usr/share:/var/lib/snapd/desktop:/usr/share",
+    "XDG_CONFIG_DIRS": "/etc/xdg/xdg-xubuntu:/etc/xdg:/etc/xdg",
+    "npm_package_author_name": "Ian Hansborough",
+    "npm_package_dependencies_styled_components": "^4.3.2",
+    "npm_config_save_prefix": "^",
+    "npm_config_ignore_optional": "",
+    "CONDA_PREFIX": "/home/jcunningham/miniconda3",
+    "npm_package_resolutions_deck_gl": "7.1.5",
+    "VTE_VERSION": "5202",
+    "npm_package_dependencies_babel_loader": "^8.0.6",
+    "INIT_CWD": "/home/jcunningham/code/osu/au19/capstone/react-ui",
+    "npm_package_dependencies_react": "^16.9.0",
+    "npm_package_dependencies__babel_preset_env": "^7.5.5",
+    "WEBPACK_DEV_SERVER": "true"
+  },
+  "userLimits": {
+    "core_file_size_blocks": {
+      "soft": 0,
+      "hard": "unlimited"
+    },
+    "data_seg_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_locked_memory_bytes": {
+      "soft": 16777216,
+      "hard": 16777216
+    },
+    "max_memory_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "open_files": {
+      "soft": 1048576,
+      "hard": 1048576
+    },
+    "stack_size_bytes": {
+      "soft": 8388608,
+      "hard": "unlimited"
+    },
+    "cpu_time_seconds": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_user_processes": {
+      "soft": 256373,
+      "hard": 256373
+    },
+    "virtual_memory_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    }
+  },
+  "sharedObjects": [
+    "linux-vdso.so.1",
+    "/lib/x86_64-linux-gnu/libdl.so.2",
+    "/lib/x86_64-linux-gnu/librt.so.1",
+    "/usr/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "/lib/x86_64-linux-gnu/libm.so.6",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/lib/x86_64-linux-gnu/libc.so.6",
+    "/lib64/ld-linux-x86-64.so.2",
+    "/lib/x86_64-linux-gnu/libnss_files.so.2"
+  ]
+}

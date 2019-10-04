@@ -7,14 +7,14 @@ import store from "@/ducks";
 import { sendMessage } from "@/utils/speaq-api";
 import styled from "styled-components";
 import { Chat } from "@/components/chat";
-import { AutoSizer } from "react-virtualized"
+import { AutoSizer } from "react-virtualized";
 
 const MainContainer = styled.div`
 	display: grid;
 	height: 100vh;
 	grid-template-columns: repeat(12, 1fr);
 	grid-template-rows: min-content auto;
-	background-color: #29323C;
+	background-color: #29323c;
 `;
 
 const MapContainer = styled.div`
@@ -31,21 +31,27 @@ const LogoutButton = styled.a`
 	align-self: center;
 	justify-self: center;
 	color: white;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	padding: .25em 1em;
-	margin: .5em;
-	background-color: #FF4136;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	padding: 0.25em 1em;
+	margin: 0.5em;
+	background-color: #ff4136;
 	border-radius: 4px;
-	border: 2px solid #FF4136;
+	border: 2px solid #ff4136;
 
 	&:hover {
-		cursor: pointer
+		cursor: pointer;
 	}
 `;
 
 export default class Visualizer extends Component {
 	constructor(props) {
 		super(props);
+	}
+
+	componentDidMount() {
+		const { toggleSidePanel } = this.props;
+		toggleSidePanel();
 	}
 
 	render() {
@@ -56,18 +62,18 @@ export default class Visualizer extends Component {
 			<MainContainer>
 				<LogoutButton onClick={logout}>Logout</LogoutButton>
 				<ChatContainer>
-					<Chat />
+					<Chat {...this.props} />
 				</ChatContainer>
 				<MapContainer>
 					<AutoSizer>
-						{({height, width}) => (
+						{({ height, width }) => (
 							<KeplerGl
-							id="foo"
-							store={store}
-							mapboxApiAccessToken={mapboxAccessToken}
-							width={width}
-							height={height}
-						/>
+								id="foo"
+								store={store}
+								mapboxApiAccessToken={mapboxAccessToken}
+								width={width}
+								height={height}
+							/>
 						)}
 					</AutoSizer>
 				</MapContainer>
