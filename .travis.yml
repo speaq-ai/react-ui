@@ -4,6 +4,6 @@ node_js:
 jobs: 
   include: 
     - stage: build
-      script: yarn build
+      script: yarn build --mode=production
     - stage: test
       script: yarn test
