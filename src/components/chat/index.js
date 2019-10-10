@@ -187,7 +187,17 @@ export class Chat extends Component {
   }
 
   _clearDataset(dataset) {
-    this.props.removeDataset(dataset);
+    if (dataset != "Everything") {
+      this.props.removeDataset(dataset);
+    } else {
+      // Everything
+      const { removeDataset, keplerGl } = this.props;
+      const { visState } = keplerGl.foo
+
+      Object.values(visState.datasets).forEach(function (datasetObj) {
+        removeDataset(datasetObj.id);
+      });
+    }
   }
 
   async _loadDataset(datasetName) {
