@@ -86,10 +86,8 @@ export class Chat extends Component {
     });
     const res = await sendMessage(this.state.inputText);
     this.setState({ responses: this.state.responses.slice(0, -1) });
-    const responses = this.state.responses.concat(
-      res.text ? res.text : "no response..."
-    );
-    this.setState({ responses });
+
+    this._addMessageToState(res.text ? res.text : "no response...")
 
     switch (res.action) {
       case null:
@@ -115,6 +113,11 @@ export class Chat extends Component {
     }
   };
 
+  _addMessageToState(message) {
+    const responses = this.state.responses.concat(message);
+    this.setState({ responses });
+  }
+
   // NOTE: uncomment to demo functionality without having to talk to watson
   // async componentDidMount() {
   //   await this._loadDataset("name");
@@ -132,30 +135,39 @@ export class Chat extends Component {
    * most recently loaded dataset ID.
    */
   async _addFilter(field, value, comparator, dataset) {
-    const { addFilter, setFilter, keplerGl } = this.props;
-    const { visState } = keplerGl.foo;
-    const datasetId = dataset || Object.values(visState.datasets)[0].id;
-    const filterId = visState.filters.length;
+    // validation
+    if (this._validateDatasetExists(dataset)) {
+      if (this._validateField(dataset, field)) {
+        const { addFilter, setFilter, keplerGl } = this.props;
+        const { visState } = keplerGl.foo;
+        const datasetId = dataset || Object.values(visState.datasets)[0].id;
+        const filterId = visState.filters.length;
 
-    await addFilter(datasetId);
-    // get the ID of the filter we just added
-    await setFilter(filterId, "name", this._resolveField(field));
+        await addFilter(datasetId);
+        // get the ID of the filter we just added
+        await setFilter(filterId, "name", this._resolveField(field));
 
-    switch (comparator) {
-      case "greater than":
-        await this._setGtFilter(filterId, value);
-        break;
-      case "less than":
-        await this._setLtFilter(filterId, value);
-        break;
-      case "equal":
-        await this._setEqFilter(filterId, value);
-        break;
-      default:
-        // do nothing
-        // TODO: change this in the future. For our MVP demo, we can default to less than
-        await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
-        break;
+        switch (comparator) {
+          case "greater than":
+            await this._setGtFilter(filterId, value);
+            break;
+          case "less than":
+            await this._setLtFilter(filterId, value);
+            break;
+          case "equal":
+            await this._setEqFilter(filterId, value);
+            break;
+          default:
+            // do nothing
+            // TODO: change this in the future. For our MVP demo, we can default to less than
+            await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
+            break;
+        }
+      } else {
+        this._addMessageToState("That doesn't look like a valid field on that dataset.");
+      }
+    } else {
+      this._addMessageToState("Sorry, we can't find that dataset.");
     }
   }
 
@@ -187,16 +199,17 @@ export class Chat extends Component {
   }
 
   _clearDataset(dataset) {
-    if (dataset != "Everything") {
-      this.props.removeDataset(dataset);
+    if (this._validateDatasetExists(dataset)) {
+      if (dataset != "Everything") {
+        this.props.removeDataset(dataset);
+      } else {
+        // Everything
+        this._getAllDatasets().forEach(function (datasetObj) {
+          removeDataset(datasetObj.id);
+        });
+      }
     } else {
-      // Everything
-      const { removeDataset, keplerGl } = this.props;
-      const { visState } = keplerGl.foo
-
-      Object.values(visState.datasets).forEach(function (datasetObj) {
-        removeDataset(datasetObj.id);
-      });
+      this._addMessageToState("Sorry, we can't find that dataset.");
     }
   }
 
@@ -223,6 +236,53 @@ export class Chat extends Component {
     };
 
     return datasetMap[datasetName];
+  }
+
+  // return as an array
+  _getAllDatasets() {
+    const { removeDataset, keplerGl } = this.props;
+    const { visState } = keplerGl.foo;
+    return Object.values(visState.datasets);
+  }
+
+  _validateDatasetExists(datasetName) {
+    if (datasetName == "Everything") { return true; }
+
+    // maybe there's a better way to do this but I haven't found it in the kepler docs, feel free to redo this
+    var i = 0;
+    var datasets = this._getAllDatasets();
+
+    while (i < datasets.length) {
+      if (datasets[i].id == datasetName) { return true; }
+      i++;
+    }
+
+    return false;
+  }
+
+  _validateField(datasetName, field) {
+    // assume dataset exists
+    var datasets = this._getAllDatasets();
+    var dataset = null;
+    var i = 0;
+
+    while (i < datasets.length && dataset == null) {
+      if (datasets[i].id == datasetName) {
+        dataset = datasets[i]
+      }
+
+      i++;
+    }
+
+    // found the dataset
+    i = 0;
+    while (i < dataset.fields.length) {
+      if (dataset.fields[i].name == field) { return true; }
+      i++;
+    }
+
+    // if not already found and returned
+    return false;
   }
 
   _renderResponses() {
