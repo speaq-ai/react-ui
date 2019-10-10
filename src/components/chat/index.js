@@ -72,7 +72,6 @@ export class Chat extends Component {
   state = {
     inputText: "",
     responses: [],
-    nextDatasetId: 0,
   };
 
   constructor(props) {
@@ -101,7 +100,8 @@ export class Chat extends Component {
         this._addFilter(
           res.variables.filter_field,
           res.variables.sys_number,
-          res.variables.filter_comparison
+          res.variables.filter_comparison,
+          res.variables.dataset_name
         );
         break;
 
@@ -110,7 +110,7 @@ export class Chat extends Component {
         break;
 
       case this.ActionKeys.Clear:
-        this._clearDatasets();
+        this._clearDataset(res.variables.dataset_name);
         break;
     }
   };
@@ -186,13 +186,8 @@ export class Chat extends Component {
     return fieldMap[field];
   }
 
-  _clearDatasets() {
-    var i;
-    for (i = 0; i < this.state.nextDatasetId; i++) {
-      this.props.removeDataset("" + i);
-    }
-
-    this.setState({ nextDatasetId: 0 });
+  _clearDataset(dataset) {
+    this.props.removeDataset(dataset);
   }
 
   async _loadDataset(datasetName) {
@@ -203,14 +198,12 @@ export class Chat extends Component {
         {
           info: {
             label: datasetName,
-            id: "" + this.state.nextDatasetId,
+            id: datasetName,
           },
           data: processCsvData(data),
         },
       ],
     });
-
-    await this.setState({ nextDatasetId: this.state.nextDatasetId + 1 });
   }
 
   _resolveDataset(datasetName) {
