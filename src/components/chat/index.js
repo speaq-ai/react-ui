@@ -85,8 +85,8 @@ export class Chat extends Component {
       responses: [...this.state.responses, "..."],
     });
     const res = await sendMessage(this.state.inputText);
-    this.setState({ responses: this.state.responses.slice(0, -1) });
 
+    this._removeLastMessage();
     this._addMessageToState(res.text ? res.text : "no response...")
 
     switch (res.action) {
@@ -112,6 +112,12 @@ export class Chat extends Component {
         break;
     }
   };
+
+  // Right now, this is used essentially every time before we add a new message
+  // however, i feel like including this in the add message code is asking for confusion down the line
+  _removeLastMessage() {
+    this.setState({ responses: this.state.responses.slice(0, -1) });
+  }
 
   _addMessageToState(message) {
     const responses = this.state.responses.concat(message);
@@ -164,9 +170,11 @@ export class Chat extends Component {
             break;
         }
       } else {
+        this._removeLastMessage();
         this._addMessageToState("That doesn't look like a valid field on that dataset.");
       }
     } else {
+      this._removeLastMessage();
       this._addMessageToState("Sorry, we can't find that dataset.");
     }
   }
@@ -209,6 +217,7 @@ export class Chat extends Component {
         });
       }
     } else {
+      this._removeLastMessage();
       this._addMessageToState("Sorry, we can't find that dataset.");
     }
   }
