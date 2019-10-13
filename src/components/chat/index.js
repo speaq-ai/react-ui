@@ -307,6 +307,9 @@ export class Chat extends Component {
       case "3D":
         await this.props.togglePerspective()
         break;
+      case "point":
+          await this.props.layerTypeChange(layers[0], "point")
+          break;
       case "grid":
         await this.props.layerTypeChange(layers[0], "grid")
         break;
