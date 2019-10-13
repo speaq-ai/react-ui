@@ -67,6 +67,7 @@ export class Chat extends Component {
     AddFilter: "AddFilter",
     LoadDataset: "LoadData",
     Clear: "Clear",
+    ChangeViewMode: "ChangeViewMode"
   };
 
   state = {
@@ -110,6 +111,10 @@ export class Chat extends Component {
       case this.ActionKeys.Clear:
         this._clearDataset(res.variables.dataset_name);
         break;
+
+      case this.ActionKeys.ChangeViewMode:
+          this._changeViewMode(res.variables.view_mode);
+          break;
     }
   };
 
@@ -292,6 +297,20 @@ export class Chat extends Component {
 
     // if not already found and returned
     return false;
+  }
+
+  async _changeViewMode(viewMode) {
+    const layers = this.props.keplerGl.foo.visState.layers;
+
+    switch(viewMode) {
+      case 3:
+      case "3D":
+        await this.props.togglePerspective()
+        break;
+      case "grid":
+        await this.props.layerTypeChange(layers[0], "grid")
+        break;
+    }
   }
 
   _renderResponses() {
