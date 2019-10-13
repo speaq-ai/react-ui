@@ -303,7 +303,7 @@ export class Chat extends Component {
     const layers = this.props.keplerGl.foo.visState.layers;
 
     switch(viewMode) {
-      case 3:
+      case 3:  // Watson strips the D for some reason
       case "3D":
         await this.props.togglePerspective()
         break;
@@ -318,6 +318,9 @@ export class Chat extends Component {
         break;
       case "hexbin":
         await this.props.layerTypeChange(layers[0], "hexagon")
+        break;
+      case "heatmap":
+        await this.props.layerTypeChange(layers[0], "heatmap")
         break;
     }
   }
