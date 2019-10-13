@@ -313,6 +313,9 @@ export class Chat extends Component {
       case "grid":
         await this.props.layerTypeChange(layers[0], "grid")
         break;
+      case "hexbin":
+        await this.props.layerTypeChange(layers[0], "hexagon")
+        break;
     }
   }
 
