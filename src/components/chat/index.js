@@ -93,7 +93,6 @@ export class Chat extends Component {
   state = {
     inputText: "",
     responses: [],
-    speechAudio: null,
     nextDatasetId: 0,
   };
 
