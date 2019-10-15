@@ -67,7 +67,8 @@ export class Chat extends Component {
     AddFilter: "AddFilter",
     LoadDataset: "LoadData",
     Clear: "Clear",
-    ChangeViewMode: "ChangeViewMode"
+    ChangeViewMode: "ChangeViewMode",
+    ViewAction: "ViewAction",
   };
 
   state = {
@@ -113,8 +114,12 @@ export class Chat extends Component {
         break;
 
       case this.ActionKeys.ChangeViewMode:
-          this._changeViewMode(res.variables.view_mode);
-          break;
+        this._changeViewMode(res.variables.view_mode);
+        break;
+
+      case this.ActionKeys.ViewAction:
+        this._executeViewAction(res.variables.view_action);
+        break;
     }
   };
 
@@ -321,6 +326,36 @@ export class Chat extends Component {
         break;
       case "heatmap":
         await this.props.layerTypeChange(layers[0], "heatmap")
+        break;
+    }
+  }
+
+  async _executeViewAction(viewAction) {
+    const mapState = this.props.keplerGl.foo.mapState;
+
+    switch (viewAction) {
+      case "in":
+        await this.props.updateMap({zoom: mapState.zoom * 1.1})
+        break;
+      case "out":
+        await this.props.updateMap({zoom: mapState.zoom * 0.9})
+        break;
+      case "up":
+        await this.props.updateMap({latitude: mapState.latitude + 0.01});
+        break;
+      case "down":
+        await this.props.updateMap({latitude: mapState.latitude - 0.01});
+        break;
+      case "right":
+        await this.props.updateMap({longitude: mapState.longitude + 0.01});
+        break;
+      case "left":
+        await this.props.updateMap({longitude: mapState.longitude - 0.01});
+        break;
+      case "enhance":
+        await this.props.togglePerspective();
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await this.props.updateMap({zoom: mapState.zoom * 2});
         break;
     }
   }
