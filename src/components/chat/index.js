@@ -150,41 +150,53 @@ export class Chat extends Component {
    * most recently loaded dataset ID.
    */
   async _addFilter(field, value, comparator, dataset) {
-    // validation
-    if (this._validateDatasetExists(dataset)) {
-      if (this._validateField(dataset, field)) {
-        const { addFilter, setFilter, keplerGl } = this.props;
-        const { visState } = keplerGl.foo;
-        const datasetId = dataset || Object.values(visState.datasets)[0].id;
-        const filterId = visState.filters.length;
+    // generally, we let watson append the success message, but as filter-everything can result
+    // in multiple successes and failures, we want to remove only the watson response, and then append a result for
+    // each filter processed.
+    this._removeLastMessage();
 
-        await addFilter(datasetId);
-        // get the ID of the filter we just added
-        await setFilter(filterId, "name", this._resolveField(field));
+    if (dataset == "Everything") {
+      this._getAllDatasets().forEach((datasetObj) => {
+        this._addMessageToState("adding filter...");
+        this._addFilter(field, value, comparator, datasetObj.id);
+      });
+    } else {
+      // validation
+      if (this._validateDatasetExists(dataset)) {
+        if (this._validateField(dataset, field)) {
+          const { addFilter, setFilter, keplerGl } = this.props;
+          const { visState } = keplerGl.foo;
+          const datasetId = dataset || Object.values(visState.datasets)[0].id;
+          const filterId = visState.filters.length;
 
-        switch (comparator) {
-          case "greater than":
-            await this._setGtFilter(filterId, value);
-            break;
-          case "less than":
-            await this._setLtFilter(filterId, value);
-            break;
-          case "equal":
-            await this._setEqFilter(filterId, value);
-            break;
-          default:
-            // do nothing
-            // TODO: change this in the future. For our MVP demo, we can default to less than
-            await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
-            break;
+          await addFilter(datasetId);
+          // get the ID of the filter we just added
+          await setFilter(filterId, "name", this._resolveField(field));
+
+          switch (comparator) {
+            case "greater than":
+              await this._setGtFilter(filterId, value);
+              break;
+            case "less than":
+              await this._setLtFilter(filterId, value);
+              break;
+            case "equal":
+              await this._setEqFilter(filterId, value);
+              break;
+            default:
+              // do nothing
+              // TODO: change this in the future. For our MVP demo, we can default to less than
+              await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
+              break;
+          }
+
+          this._addMessageToState("Great, let's get that filter going.");
+        } else {
+          this._addMessageToState("That doesn't look like a valid field on the " + dataset + " dataset.");
         }
       } else {
-        this._removeLastMessage();
-        this._addMessageToState("That doesn't look like a valid field on that dataset.");
+        this._addMessageToState("Sorry, we can't find that dataset.");
       }
-    } else {
-      this._removeLastMessage();
-      this._addMessageToState("Sorry, we can't find that dataset.");
     }
   }
 
@@ -221,8 +233,8 @@ export class Chat extends Component {
         this.props.removeDataset(dataset);
       } else {
         // Everything
-        this._getAllDatasets().forEach(function (datasetObj) {
-          removeDataset(datasetObj.id);
+        this._getAllDatasets().forEach((datasetObj) => {
+          this.props.removeDataset(datasetObj.id);
         });
       }
     } else {
