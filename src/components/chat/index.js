@@ -254,43 +254,21 @@ export class Chat extends Component {
   }
 
   _validateDatasetExists(datasetName) {
-    if (datasetName == "Everything") { return true; }
+    const datasets = this._getAllDatasets();
 
-    // maybe there's a better way to do this but I haven't found it in the kepler docs, feel free to redo this
-    var i = 0;
-    var datasets = this._getAllDatasets();
-
-    while (i < datasets.length) {
-      if (datasets[i].id == datasetName) { return true; }
-      i++;
-    }
-
-    return false;
+    if (datasetName == "Everything") return true;
+    return datasets.find(dataset => dataset.id == datasetName) ? true : false;
   }
 
   _validateField(datasetName, field) {
-    // assume dataset exists
-    var datasets = this._getAllDatasets();
-    var dataset = null;
-    var i = 0;
+    const datasets = this._getAllDatasets();
+    const dataset = datasets.find(dataset => dataset.id == datasetName);
 
-    while (i < datasets.length && dataset == null) {
-      if (datasets[i].id == datasetName) {
-        dataset = datasets[i]
-      }
-
-      i++;
+    if (dataset) {
+      return dataset.fields.find(f => f.name == field) ? true : false;
+    } else {
+      return false;
     }
-
-    // found the dataset
-    i = 0;
-    while (i < dataset.fields.length) {
-      if (dataset.fields[i].name == field) { return true; }
-      i++;
-    }
-
-    // if not already found and returned
-    return false;
   }
 
   _renderResponses() {
