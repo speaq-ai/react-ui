@@ -217,12 +217,14 @@ export class Chat extends Component {
 
   _clearDataset(dataset) {
     if (this._validateDatasetExists(dataset)) {
+      const { removeDataset } = this.props;
+
       if (dataset != "Everything") {
-        this.props.removeDataset(dataset);
+        removeDataset(dataset);
       } else {
         // Everything
         this._getAllDatasets().forEach(function (datasetObj) {
-          this.props.removeDataset(datasetObj.id);
+          removeDataset(datasetObj.id);
         });
       }
     } else {
