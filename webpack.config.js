@@ -1,7 +1,7 @@
 var path = require("path");
 var Dotenv = require("dotenv-webpack");
 
-module.exports = {
+let config = {
 	entry: "./src/index.js", // path to entry script
 	output: {
 		// configure to bundle output
@@ -32,3 +32,13 @@ module.exports = {
 		},
 	},
 };
+
+module.exports = (env, argv) => {
+	if (argv.mode === 'development') {
+		config.devtool = 'eval';
+	} else {
+		config.devtool = 'source-map'
+	}
+
+	return config;
+}
