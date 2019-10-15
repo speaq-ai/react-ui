@@ -66,6 +66,8 @@ export class Chat extends Component {
     AddFilter: "AddFilter",
     LoadDataset: "LoadData",
     Clear: "Clear",
+    ChangeViewMode: "ChangeViewMode",
+    ViewAction: "ViewAction",
   };
 
   state = {
@@ -108,6 +110,14 @@ export class Chat extends Component {
 
       case this.ActionKeys.Clear:
         this._clearDataset(res.variables.dataset_name);
+        break;
+
+      case this.ActionKeys.ChangeViewMode:
+        this._changeViewMode(res.variables.view_mode);
+        break;
+
+      case this.ActionKeys.ViewAction:
+        this._executeViewAction(res.variables.view_action);
         break;
     }
   };
@@ -268,6 +278,60 @@ export class Chat extends Component {
       return dataset.fields.find(f => f.name == field) ? true : false;
     } else {
       return false;
+    }
+  }
+
+  async _changeViewMode(viewMode) {
+    const layers = this.props.keplerGl.foo.visState.layers;
+
+    switch(viewMode) {
+      case 3:  // Watson strips the D for some reason
+      case "3D":
+        await this.props.togglePerspective()
+        break;
+      case "cluster":
+        await this.props.layerTypeChange(layers[0], "cluster")
+        break;
+      case "point":
+        await this.props.layerTypeChange(layers[0], "point")
+        break;
+      case "grid":
+        await this.props.layerTypeChange(layers[0], "grid")
+        break;
+      case "hexbin":
+        await this.props.layerTypeChange(layers[0], "hexagon")
+        break;
+      case "heatmap":
+        await this.props.layerTypeChange(layers[0], "heatmap")
+        break;
+    }
+  }
+
+  async _executeViewAction(viewAction) {
+    const mapState = this.props.keplerGl.foo.mapState;
+
+    switch (viewAction) {
+      case "in":
+        await this.props.updateMap({zoom: mapState.zoom * 1.1})
+        break;
+      case "out":
+        await this.props.updateMap({zoom: mapState.zoom * 0.9})
+        break;
+      case "up":
+        await this.props.updateMap({latitude: mapState.latitude + 0.01});
+        break;
+      case "down":
+        await this.props.updateMap({latitude: mapState.latitude - 0.01});
+        break;
+      case "right":
+        await this.props.updateMap({longitude: mapState.longitude + 0.01});
+        break;
+      case "left":
+        await this.props.updateMap({longitude: mapState.longitude - 0.01});
+        break;
+      case "enhance":
+        await this.props.updateMap({zoom: mapState.zoom * 1.5});
+        break;
     }
   }
 
