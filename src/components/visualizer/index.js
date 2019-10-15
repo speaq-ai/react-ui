@@ -35,7 +35,6 @@ const NavContainer = styled.div`
 `;
 
 const Logo = styled.div`
-	background-image: url(${logo});
 	background-color: #15a5fa;
 	background-repeat: no-repeat;
 	background-position: center;
