@@ -94,7 +94,7 @@ export default class Visualizer extends Component {
 	state = {
 		chatPanelOpen: true,
 		inputFormat: "text",
-		outputFormat: "text",
+		outputAsSpeech: false,
 	};
 
 	componentDidMount() {
@@ -105,7 +105,7 @@ export default class Visualizer extends Component {
 	render() {
 		const mapboxAccessToken = process.env.MAPBOX_ACCESS_TOKEN;
 		const { logout } = this.props;
-		const { chatPanelOpen, inputFormat, outputFormat } = this.state;
+		const { chatPanelOpen, inputFormat, outputAsSpeech } = this.state;
 		const iconSize = 16;
 		const buttonSize = 36;
 		return (
@@ -118,7 +118,7 @@ export default class Visualizer extends Component {
 					<ChatContainer open={chatPanelOpen}>
 						<Chat
 							inputFormat={inputFormat}
-							outputFormat={outputFormat}
+							outputAsSpeech={outputAsSpeech}
 							{...this.props}
 						/>
 					</ChatContainer>
@@ -142,18 +142,15 @@ export default class Visualizer extends Component {
 										</FloatingButton>
 
 										<FloatingButton
-											backgroundColor={
-												outputFormat === "text" ? "#6A7485" : "#F27E64"
-											}
+											backgroundColor={!outputAsSpeech ? "#6A7485" : "#F27E64"}
 											size={buttonSize}
 											onClick={e =>
 												this.setState({
-													outputFormat:
-														outputFormat === "text" ? "speech" : "text",
+													outputAsSpeech: !outputAsSpeech,
 												})
 											}
 										>
-											{outputFormat === "text" ? (
+											{!outputAsSpeech ? (
 												<VolumeX color="white" size={iconSize} />
 											) : (
 												<Volume2 color="white" size={iconSize} />

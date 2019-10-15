@@ -63,16 +63,6 @@ export const Response = styled.p`
   border-bottom: 1px solid white;
 `;
 
-const InputFormatToggle = styled.input``;
-
-const OutputFormatToggle = styled.input``;
-
-const FormatToggleContainer = styled.div`
-  p {
-    font-size: 12px;
-  }
-`;
-
 const HeadingContainer = styled.div`
   background-color: #29323c;
   margin: 0;
@@ -117,19 +107,18 @@ export class Chat extends Component {
       inputText: "",
       responses: [...this.state.responses, "..."],
     });
-    const { inputFormat, outputFormat } = this.props;
+    const { inputFormat, outputAsSpeech } = this.props;
     const res = await sendMessage(this.state.inputText, {
       inputFormat,
-      outputFormat,
+      outputAsSpeech,
     });
 
     this._removeLastMessage();
     this._addMessageToState(res.text ? res.text : "no response...");
 
-    if (outputFormat === "speech") {
+    if (outputAsSpeech) {
       this._playSpeechAudio(res.speech);
     }
-    this.setState({ responses });
 
     switch (res.action) {
       case null:
@@ -384,17 +373,8 @@ export class Chat extends Component {
     ));
   }
 
-  _handleFormatToggle = (type, e) => {
-    this.setState({
-      config: {
-        ...this.state.config,
-        [type]: e.target.checked ? "speech" : "text",
-      },
-    });
-  };
-
   render() {
-    const { inputFormat, outputForamt } = this.props;
+    const { inputFormat, outputAsSpeech } = this.props;
     const { inputText } = this.state;
 
     return (
