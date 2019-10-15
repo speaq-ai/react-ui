@@ -222,7 +222,7 @@ export class Chat extends Component {
       } else {
         // Everything
         this._getAllDatasets().forEach(function (datasetObj) {
-          removeDataset(datasetObj.id);
+          this.props.removeDataset(datasetObj.id);
         });
       }
     } else {
