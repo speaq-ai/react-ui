@@ -24,6 +24,14 @@ module.exports = {
 				exclude: /node_modules/, // file matching regex
 				use: ["babel-loader"], // processor dependency name
 			},
+			{
+				test: /\.(png|jpe?g|gif)$/i,
+				use: [
+					{
+						loader: "file-loader",
+					},
+				],
+			},
 		],
 	},
 	resolve: {
