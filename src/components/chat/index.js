@@ -4,61 +4,71 @@ import { sendMessage } from "@/utils/speaq-api";
 import { processCsvData } from "kepler.gl/processors";
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
-
+import FileSaver from "file-saver";
+import { Send } from "react-feather";
 export const ChatContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    background-color: #242730;
-    color: white;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #white;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  height: 100%;
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
 `;
 
 export const MessageInput = styled.input`
-	padding: 5px 10px;
-	border-radius: 3px;
-	outline: none;
-	border: 1px solid gray;
-	border-right: none;
-	font-size: 1rem;
-	color: black;
-    background-color: white;
-    width: 75%;
+  padding: 5px 10px;
+  border: none;
+  outline: none;
+  color: white;
+  background-color: #2b4059;
+  width: 75%;
+  font-size: 14px;
+  &::placeholder {
+    color: #b6defa;
+  }
 `;
 
 export const MessageButton = styled.button`
-	padding: 5px 10px;
-	border-radius: 3px;
-	outline: none;
-	border: 1px solid gray;
-	color: black;
-	background-color: lightgray;
-	font-size: 0.6rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  outline: none;
+  color: white;
+  background-color: #15a5fa;
+  font-size: 0.6rem;
 `;
 
 export const ResponseContainer = styled.div`
-    height: 100%;
-`;
-
-export const ChatTitle = styled.h3`
-    background-color: #29323C;
-    margin: 0;
-    padding: 1em;
+  height: 100%;
+  background-color: rgba(43, 64, 89, 0.95);
+  max-height: calc(100% - 40px);
+  overflow: scroll;
 `;
 
 export const MessageForm = styled.form`
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    margin: 0;
-    padding: 1em 0;
-    background-color: #29323C;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 0;
+  padding: 5px 0;
+  background-color: #2b4059;
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
 `;
 
 export const Response = styled.p`
-    margin: 0;
-    padding: 1em;
-    border-bottom: 1px solid white;
+  margin: 0;
+  padding: 1em;
+  border-bottom: 1px solid white;
+`;
+
+const HeadingContainer = styled.div`
+  background-color: #29323c;
+  margin: 0;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
 `;
 
 export class Chat extends Component {
@@ -79,16 +89,36 @@ export class Chat extends Component {
     super(props);
   }
 
+  _playSpeechAudio = speech => {
+    const byteData = atob(speech);
+    const byteNums = new Array(byteData.length);
+    for (let i = 0; i < byteData.length; i++) {
+      byteNums[i] = byteData.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNums);
+    const speechUrl = URL.createObjectURL(new Blob([byteArray]));
+    const speechAudio = new Audio(speechUrl);
+    speechAudio.play();
+  };
+
   _sendMessage = async e => {
     e.preventDefault();
     this.setState({
       inputText: "",
       responses: [...this.state.responses, "..."],
     });
-    const res = await sendMessage(this.state.inputText);
+    const { inputFormat, outputAsSpeech } = this.props;
+    const res = await sendMessage(this.state.inputText, {
+      inputFormat,
+      outputAsSpeech,
+    });
 
     this._removeLastMessage();
-    this._addMessageToState(res.text ? res.text : "no response...")
+    this._addMessageToState(res.text ? res.text : "no response...");
+
+    if (outputAsSpeech) {
+      this._playSpeechAudio(res.speech);
+    }
 
     switch (res.action) {
       case null:
@@ -217,12 +247,12 @@ export class Chat extends Component {
 
   _resolveField(field) {
     var fieldMap = {
-      "price": "price",
-      "beds": "beds",
-      "baths": "baths",
-      "year": "year",
-      "magnitude": "magnitude",
-      "depth": "depth"
+      price: "price",
+      beds: "beds",
+      baths: "baths",
+      year: "year",
+      magnitude: "magnitude",
+      depth: "depth",
     };
     return fieldMap[field];
   }
@@ -261,8 +291,8 @@ export class Chat extends Component {
 
   _resolveDataset(datasetName) {
     var datasetMap = {
-      "Earthquake": earthquake,
-      "Sacramento real estate": sacramentoRealEstate
+      Earthquake: earthquake,
+      "Sacramento real estate": sacramentoRealEstate,
     };
 
     return datasetMap[datasetName];
@@ -296,25 +326,25 @@ export class Chat extends Component {
   async _changeViewMode(viewMode) {
     const layers = this.props.keplerGl.foo.visState.layers;
 
-    switch(viewMode) {
-      case 3:  // Watson strips the D for some reason
+    switch (viewMode) {
+      case 3: // Watson strips the D for some reason
       case "3D":
-        await this.props.togglePerspective()
+        await this.props.togglePerspective();
         break;
       case "cluster":
-        await this.props.layerTypeChange(layers[0], "cluster")
+        await this.props.layerTypeChange(layers[0], "cluster");
         break;
       case "point":
-        await this.props.layerTypeChange(layers[0], "point")
+        await this.props.layerTypeChange(layers[0], "point");
         break;
       case "grid":
-        await this.props.layerTypeChange(layers[0], "grid")
+        await this.props.layerTypeChange(layers[0], "grid");
         break;
       case "hexbin":
-        await this.props.layerTypeChange(layers[0], "hexagon")
+        await this.props.layerTypeChange(layers[0], "hexagon");
         break;
       case "heatmap":
-        await this.props.layerTypeChange(layers[0], "heatmap")
+        await this.props.layerTypeChange(layers[0], "heatmap");
         break;
     }
   }
@@ -324,25 +354,25 @@ export class Chat extends Component {
 
     switch (viewAction) {
       case "in":
-        await this.props.updateMap({zoom: mapState.zoom * 1.1})
+        await this.props.updateMap({ zoom: mapState.zoom * 1.1 });
         break;
       case "out":
-        await this.props.updateMap({zoom: mapState.zoom * 0.9})
+        await this.props.updateMap({ zoom: mapState.zoom * 0.9 });
         break;
       case "up":
-        await this.props.updateMap({latitude: mapState.latitude + 0.01});
+        await this.props.updateMap({ latitude: mapState.latitude + 0.01 });
         break;
       case "down":
-        await this.props.updateMap({latitude: mapState.latitude - 0.01});
+        await this.props.updateMap({ latitude: mapState.latitude - 0.01 });
         break;
       case "right":
-        await this.props.updateMap({longitude: mapState.longitude + 0.01});
+        await this.props.updateMap({ longitude: mapState.longitude + 0.01 });
         break;
       case "left":
-        await this.props.updateMap({longitude: mapState.longitude - 0.01});
+        await this.props.updateMap({ longitude: mapState.longitude - 0.01 });
         break;
       case "enhance":
-        await this.props.updateMap({zoom: mapState.zoom * 1.5});
+        await this.props.updateMap({ zoom: mapState.zoom * 1.5 });
         break;
     }
   }
@@ -354,20 +384,21 @@ export class Chat extends Component {
   }
 
   render() {
+    const { inputFormat, outputAsSpeech } = this.props;
     const { inputText } = this.state;
 
     return (
       <ChatContainer>
-        <ChatTitle>Chat With Watson</ChatTitle>
         <ResponseContainer>{this._renderResponses()}</ResponseContainer>
         <MessageForm id="message-form">
           <MessageInput
             type="text"
             value={inputText}
+            placeholder="Type your message here"
             onChange={e => this.setState({ inputText: e.target.value })}
           />
           <MessageButton type="submit" onClick={this._sendMessage}>
-            Send
+            <Send color="white" size={14} />
           </MessageButton>
         </MessageForm>
       </ChatContainer>
