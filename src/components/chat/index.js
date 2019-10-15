@@ -353,9 +353,7 @@ export class Chat extends Component {
         await this.props.updateMap({longitude: mapState.longitude - 0.01});
         break;
       case "enhance":
-        await this.props.togglePerspective();
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        await this.props.updateMap({zoom: mapState.zoom * 2});
+        await this.props.updateMap({zoom: mapState.zoom * 1.5});
         break;
     }
   }
