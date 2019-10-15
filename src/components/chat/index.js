@@ -5,61 +5,60 @@ import { processCsvData } from "kepler.gl/processors";
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
 
-const ChatContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: #242730;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  height: 100%;
+export const ChatContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    background-color: #242730;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    height: 100%;
 `;
 
-const MessageInput = styled.input`
-  padding: 5px 10px;
-  border-radius: 3px;
-  outline: none;
-  border: 1px solid gray;
-  border-right: none;
-  font-size: 1rem;
-  color: black;
-  background-color: white;
-  width: 75%;
+export const MessageInput = styled.input`
+	padding: 5px 10px;
+	border-radius: 3px;
+	outline: none;
+	border: 1px solid gray;
+	border-right: none;
+	font-size: 1rem;
+	color: black;
+    background-color: white;
+    width: 75%;
 `;
 
-const MessageButton = styled.button`
-  padding: 5px 10px;
-  border-radius: 3px;
-  outline: none;
-  border: 1px solid gray;
-  color: black;
-  background-color: lightgray;
-  font-size: 0.6rem;
+export const MessageButton = styled.button`
+	padding: 5px 10px;
+	border-radius: 3px;
+	outline: none;
+	border: 1px solid gray;
+	color: black;
+	background-color: lightgray;
+	font-size: 0.6rem;
 `;
 
-const ResponseContainer = styled.div`
-  height: 100%;
+export const ResponseContainer = styled.div`
+    height: 100%;
 `;
 
-const ChatTitle = styled.h3`
-  background-color: #29323c;
-  margin: 0;
-  padding: 1em;
+export const ChatTitle = styled.h3`
+    background-color: #29323C;
+    margin: 0;
+    padding: 1em;
 `;
 
-const MessageForm = styled.form`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  margin: 0;
-  padding: 1em 0;
-  background-color: #29323c;
+export const MessageForm = styled.form`
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 0;
+    padding: 1em 0;
+    background-color: #29323C;
 `;
 
-const Response = styled.p`
-  margin: 0;
-  padding: 1em;
-  border-bottom: 1px solid white;
+export const Response = styled.p`
+    margin: 0;
+    padding: 1em;
+    border-bottom: 1px solid white;
 `;
 
 export class Chat extends Component {
@@ -265,43 +264,21 @@ export class Chat extends Component {
   }
 
   _validateDatasetExists(datasetName) {
-    if (datasetName == "Everything") { return true; }
+    const datasets = this._getAllDatasets();
 
-    // maybe there's a better way to do this but I haven't found it in the kepler docs, feel free to redo this
-    var i = 0;
-    var datasets = this._getAllDatasets();
-
-    while (i < datasets.length) {
-      if (datasets[i].id == datasetName) { return true; }
-      i++;
-    }
-
-    return false;
+    if (datasetName == "Everything") return true;
+    return datasets.find(dataset => dataset.id == datasetName) ? true : false;
   }
 
   _validateField(datasetName, field) {
-    // assume dataset exists
-    var datasets = this._getAllDatasets();
-    var dataset = null;
-    var i = 0;
+    const datasets = this._getAllDatasets();
+    const dataset = datasets.find(dataset => dataset.id == datasetName);
 
-    while (i < datasets.length && dataset == null) {
-      if (datasets[i].id == datasetName) {
-        dataset = datasets[i]
-      }
-
-      i++;
+    if (dataset) {
+      return dataset.fields.find(f => f.name == field) ? true : false;
+    } else {
+      return false;
     }
-
-    // found the dataset
-    i = 0;
-    while (i < dataset.fields.length) {
-      if (dataset.fields[i].name == field) { return true; }
-      i++;
-    }
-
-    // if not already found and returned
-    return false;
   }
 
   async _changeViewMode(viewMode) {
