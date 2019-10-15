@@ -6,7 +6,7 @@ import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
 import FileSaver from "file-saver";
 import { Send } from "react-feather";
-const ChatContainer = styled.div`
+export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #white;
@@ -17,7 +17,7 @@ const ChatContainer = styled.div`
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
 `;
 
-const MessageInput = styled.input`
+export const MessageInput = styled.input`
   padding: 5px 10px;
   border: none;
   outline: none;
@@ -30,7 +30,7 @@ const MessageInput = styled.input`
   }
 `;
 
-const MessageButton = styled.button`
+export const MessageButton = styled.button`
   width: 30px;
   height: 30px;
   border-radius: 3px;
@@ -40,16 +40,14 @@ const MessageButton = styled.button`
   font-size: 0.6rem;
 `;
 
-const ResponseContainer = styled.div`
+export const ResponseContainer = styled.div`
   height: 100%;
   background-color: rgba(43, 64, 89, 0.95);
   max-height: calc(100% - 40px);
   overflow: scroll;
 `;
 
-const ChatTitle = styled.h3``;
-
-const MessageForm = styled.form`
+export const MessageForm = styled.form`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -59,7 +57,7 @@ const MessageForm = styled.form`
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
 `;
 
-const Response = styled.p`
+export const Response = styled.p`
   margin: 0;
   padding: 1em;
   border-bottom: 1px solid white;
@@ -88,12 +86,13 @@ export class Chat extends Component {
     AddFilter: "AddFilter",
     LoadDataset: "LoadData",
     Clear: "Clear",
+    ChangeViewMode: "ChangeViewMode",
+    ViewAction: "ViewAction",
   };
 
   state = {
     inputText: "",
     responses: [],
-    nextDatasetId: 0,
   };
 
   constructor(props) {
@@ -123,10 +122,10 @@ export class Chat extends Component {
       inputFormat,
       outputFormat,
     });
-    this.setState({ responses: this.state.responses.slice(0, -1) });
-    const responses = this.state.responses.concat(
-      res.text ? res.text : "no response..."
-    );
+
+    this._removeLastMessage();
+    this._addMessageToState(res.text ? res.text : "no response...");
+
     if (outputFormat === "speech") {
       this._playSpeechAudio(res.speech);
     }
@@ -141,7 +140,8 @@ export class Chat extends Component {
         this._addFilter(
           res.variables.filter_field,
           res.variables.sys_number,
-          res.variables.filter_comparison
+          res.variables.filter_comparison,
+          res.variables.dataset_name
         );
         break;
 
@@ -150,10 +150,29 @@ export class Chat extends Component {
         break;
 
       case this.ActionKeys.Clear:
-        this._clearDatasets();
+        this._clearDataset(res.variables.dataset_name);
+        break;
+
+      case this.ActionKeys.ChangeViewMode:
+        this._changeViewMode(res.variables.view_mode);
+        break;
+
+      case this.ActionKeys.ViewAction:
+        this._executeViewAction(res.variables.view_action);
         break;
     }
   };
+
+  // Right now, this is used essentially every time before we add a new message
+  // however, i feel like including this in the add message code is asking for confusion down the line
+  _removeLastMessage() {
+    this.setState({ responses: this.state.responses.slice(0, -1) });
+  }
+
+  _addMessageToState(message) {
+    const responses = this.state.responses.concat(message);
+    this.setState({ responses });
+  }
 
   // NOTE: uncomment to demo functionality without having to talk to watson
   // async componentDidMount() {
@@ -172,30 +191,43 @@ export class Chat extends Component {
    * most recently loaded dataset ID.
    */
   async _addFilter(field, value, comparator, dataset) {
-    const { addFilter, setFilter, keplerGl } = this.props;
-    const { visState } = keplerGl.foo;
-    const datasetId = dataset || Object.values(visState.datasets)[0].id;
-    const filterId = visState.filters.length;
+    // validation
+    if (this._validateDatasetExists(dataset)) {
+      if (this._validateField(dataset, field)) {
+        const { addFilter, setFilter, keplerGl } = this.props;
+        const { visState } = keplerGl.foo;
+        const datasetId = dataset || Object.values(visState.datasets)[0].id;
+        const filterId = visState.filters.length;
 
-    await addFilter(datasetId);
-    // get the ID of the filter we just added
-    await setFilter(filterId, "name", this._resolveField(field));
+        await addFilter(datasetId);
+        // get the ID of the filter we just added
+        await setFilter(filterId, "name", this._resolveField(field));
 
-    switch (comparator) {
-      case "greater than":
-        await this._setGtFilter(filterId, value);
-        break;
-      case "less than":
-        await this._setLtFilter(filterId, value);
-        break;
-      case "equal":
-        await this._setEqFilter(filterId, value);
-        break;
-      default:
-        // do nothing
-        // TODO: change this in the future. For our MVP demo, we can default to less than
-        await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
-        break;
+        switch (comparator) {
+          case "greater than":
+            await this._setGtFilter(filterId, value);
+            break;
+          case "less than":
+            await this._setLtFilter(filterId, value);
+            break;
+          case "equal":
+            await this._setEqFilter(filterId, value);
+            break;
+          default:
+            // do nothing
+            // TODO: change this in the future. For our MVP demo, we can default to less than
+            await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
+            break;
+        }
+      } else {
+        this._removeLastMessage();
+        this._addMessageToState(
+          "That doesn't look like a valid field on that dataset."
+        );
+      }
+    } else {
+      this._removeLastMessage();
+      this._addMessageToState("Sorry, we can't find that dataset.");
     }
   }
 
@@ -226,13 +258,20 @@ export class Chat extends Component {
     return fieldMap[field];
   }
 
-  _clearDatasets() {
-    var i;
-    for (i = 0; i < this.state.nextDatasetId; i++) {
-      this.props.removeDataset("" + i);
+  _clearDataset(dataset) {
+    if (this._validateDatasetExists(dataset)) {
+      if (dataset != "Everything") {
+        this.props.removeDataset(dataset);
+      } else {
+        // Everything
+        this._getAllDatasets().forEach(function(datasetObj) {
+          removeDataset(datasetObj.id);
+        });
+      }
+    } else {
+      this._removeLastMessage();
+      this._addMessageToState("Sorry, we can't find that dataset.");
     }
-
-    this.setState({ nextDatasetId: 0 });
   }
 
   async _loadDataset(datasetName) {
@@ -243,14 +282,12 @@ export class Chat extends Component {
         {
           info: {
             label: datasetName,
-            id: "" + this.state.nextDatasetId,
+            id: datasetName,
           },
           data: processCsvData(data),
         },
       ],
     });
-
-    await this.setState({ nextDatasetId: this.state.nextDatasetId + 1 });
   }
 
   _resolveDataset(datasetName) {
@@ -260,6 +297,85 @@ export class Chat extends Component {
     };
 
     return datasetMap[datasetName];
+  }
+
+  // return as an array
+  _getAllDatasets() {
+    const { removeDataset, keplerGl } = this.props;
+    const { visState } = keplerGl.foo;
+    return Object.values(visState.datasets);
+  }
+
+  _validateDatasetExists(datasetName) {
+    const datasets = this._getAllDatasets();
+
+    if (datasetName == "Everything") return true;
+    return datasets.find(dataset => dataset.id == datasetName) ? true : false;
+  }
+
+  _validateField(datasetName, field) {
+    const datasets = this._getAllDatasets();
+    const dataset = datasets.find(dataset => dataset.id == datasetName);
+
+    if (dataset) {
+      return dataset.fields.find(f => f.name == field) ? true : false;
+    } else {
+      return false;
+    }
+  }
+
+  async _changeViewMode(viewMode) {
+    const layers = this.props.keplerGl.foo.visState.layers;
+
+    switch (viewMode) {
+      case 3: // Watson strips the D for some reason
+      case "3D":
+        await this.props.togglePerspective();
+        break;
+      case "cluster":
+        await this.props.layerTypeChange(layers[0], "cluster");
+        break;
+      case "point":
+        await this.props.layerTypeChange(layers[0], "point");
+        break;
+      case "grid":
+        await this.props.layerTypeChange(layers[0], "grid");
+        break;
+      case "hexbin":
+        await this.props.layerTypeChange(layers[0], "hexagon");
+        break;
+      case "heatmap":
+        await this.props.layerTypeChange(layers[0], "heatmap");
+        break;
+    }
+  }
+
+  async _executeViewAction(viewAction) {
+    const mapState = this.props.keplerGl.foo.mapState;
+
+    switch (viewAction) {
+      case "in":
+        await this.props.updateMap({ zoom: mapState.zoom * 1.1 });
+        break;
+      case "out":
+        await this.props.updateMap({ zoom: mapState.zoom * 0.9 });
+        break;
+      case "up":
+        await this.props.updateMap({ latitude: mapState.latitude + 0.01 });
+        break;
+      case "down":
+        await this.props.updateMap({ latitude: mapState.latitude - 0.01 });
+        break;
+      case "right":
+        await this.props.updateMap({ longitude: mapState.longitude + 0.01 });
+        break;
+      case "left":
+        await this.props.updateMap({ longitude: mapState.longitude - 0.01 });
+        break;
+      case "enhance":
+        await this.props.updateMap({ zoom: mapState.zoom * 1.5 });
+        break;
+    }
   }
 
   _renderResponses() {

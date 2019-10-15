@@ -3,4 +3,9 @@ node_js:
   - 10
 before_script:
   - export NODE_OPTIONS=--max-old-space-size=4096
-script: yarn build
+jobs: 
+  include: 
+    - stage: build
+      script: yarn build --mode=production
+    - stage: test
+      script: yarn test
