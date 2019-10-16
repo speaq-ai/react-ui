@@ -138,12 +138,6 @@ export class Chat extends Component {
     this.setState({ responses });
   }
 
-  // NOTE: uncomment to demo functionality without having to talk to watson
-  // async componentDidMount() {
-  //   await this._loadDataset("name");
-  //   await this._addFilter("beds", 4, "lt");
-  // }
-
   /*
    * ONLY WORKS FOR NUMERICS CURRENTLY
    * Taking actions below.
