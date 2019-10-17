@@ -402,16 +402,16 @@ export class Chat extends Component {
         await this.props.updateMap({ zoom: mapState.zoom * 0.9 });
         break;
       case "up":
-        await this.props.updateMap({ latitude: mapState.latitude + 0.01 });
+        await this.props.updateMap({ latitude: mapState.latitude + 1 / mapState.zoom });
         break;
       case "down":
-        await this.props.updateMap({ latitude: mapState.latitude - 0.01 });
+        await this.props.updateMap({ latitude: mapState.latitude - 1 / mapState.zoom });
         break;
       case "right":
-        await this.props.updateMap({ longitude: mapState.longitude + 0.01 });
+        await this.props.updateMap({ longitude: mapState.longitude + 1 / mapState.zoom });
         break;
       case "left":
-        await this.props.updateMap({ longitude: mapState.longitude - 0.01 });
+        await this.props.updateMap({ longitude: mapState.longitude - 1 / mapState.zoom });
         break;
       case "enhance":
         await this.props.updateMap({ zoom: mapState.zoom * 1.5 });
