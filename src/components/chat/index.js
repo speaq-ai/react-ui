@@ -6,6 +6,7 @@ import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
 import FileSaver from "file-saver";
 import { Send } from "react-feather";
+import { base64ToBlob, blobToBase64, AudioRecorder } from "@/utils/audio";
 export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,6 +43,7 @@ export const MessageButton = styled.button`
 
 export const ResponseContainer = styled.div`
   height: 100%;
+  padding: 0 5px;
   background-color: rgba(43, 64, 89, 0.95);
   max-height: calc(100% - 40px);
   overflow: scroll;
@@ -57,10 +59,24 @@ export const MessageForm = styled.form`
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
 `;
 
+export const Message = styled.p`
+  margin-left: 30px;
+  padding: 10px 15px;
+  background-color: #2786da;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
+`;
+
 export const Response = styled.p`
-  margin: 0;
-  padding: 1em;
-  border-bottom: 1px solid white;
+  margin-right: 30px;
+  padding: 10px 15px;
+  background-color: #436d9b;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.16);
 `;
 
 const HeadingContainer = styled.div`
@@ -89,32 +105,50 @@ export class Chat extends Component {
     super(props);
   }
 
-  _playSpeechAudio = speech => {
-    const byteData = atob(speech);
-    const byteNums = new Array(byteData.length);
-    for (let i = 0; i < byteData.length; i++) {
-      byteNums[i] = byteData.charCodeAt(i);
+  componentDidUpdate(oldProps) {
+    // when inputSpeech becomes available, use it to send a message to watson.
+    if (!oldProps.inputSpeech && !!this.props.inputSpeech) {
+      this._sendMessage();
     }
-    const byteArray = new Uint8Array(byteNums);
-    const speechUrl = URL.createObjectURL(new Blob([byteArray]));
+  }
+
+  _playSpeechAudio = speech => {
+    const speechBlob = base64ToBlob(speech);
+    const speechUrl = URL.createObjectURL(speechBlob);
     const speechAudio = new Audio(speechUrl);
     speechAudio.play();
   };
 
   _sendMessage = async e => {
-    e.preventDefault();
-    this.setState({
-      inputText: "",
-      responses: [...this.state.responses, "..."],
-    });
-    const { inputFormat, outputAsSpeech } = this.props;
-    const res = await sendMessage(this.state.inputText, {
-      inputFormat,
+    const {
       outputAsSpeech,
-    });
-
-    this._removeLastMessage();
-    this._addMessageToState(res.text ? res.text : "no response...");
+      inputSpeech,
+      mimeType,
+      onInputSpeechSent,
+    } = this.props;
+    const { inputText } = this.state;
+    e && e.preventDefault();
+    let res;
+    if (!!inputSpeech) {
+      res = await sendMessage(inputSpeech, {
+        inputFormat: "speech",
+        outputAsSpeech,
+        mimeType,
+      });
+      onInputSpeechSent();
+    } else {
+      this.setState({
+        inputText: "",
+      });
+      await this._addMessageToState(inputText, false);
+      this._addMessageToState("...", true);
+      res = await sendMessage(inputText, {
+        inputFormat: "text",
+        outputAsSpeech,
+      });
+      this._removeLastMessage();
+    }
+    this._addMessageToState(res.text ? res.text : "no response...", true);
 
     if (outputAsSpeech) {
       this._playSpeechAudio(res.speech);
@@ -158,8 +192,11 @@ export class Chat extends Component {
     this.setState({ responses: this.state.responses.slice(0, -1) });
   }
 
-  _addMessageToState(message) {
-    const responses = this.state.responses.concat(message);
+  _addMessageToState(message, isResponse) {
+    const responses = this.state.responses.concat({
+      response: isResponse,
+      text: message,
+    });
     this.setState({ responses });
   }
 
@@ -186,8 +223,8 @@ export class Chat extends Component {
     this._removeLastMessage();
 
     if (dataset == "Everything") {
-      this._getAllDatasets().forEach((datasetObj) => {
-        this._addMessageToState("adding filter...");
+      this._getAllDatasets().forEach(datasetObj => {
+        this._addMessageToState("adding filter...", true);
         this._addFilter(field, value, comparator, datasetObj.id);
       });
     } else {
@@ -220,12 +257,17 @@ export class Chat extends Component {
               break;
           }
 
-          this._addMessageToState("Great, let's get that filter going.");
+          this._addMessageToState("Great, let's get that filter going.", true);
         } else {
-          this._addMessageToState("That doesn't look like a valid field on the " + dataset + " dataset.");
+          this._addMessageToState(
+            "That doesn't look like a valid field on the " +
+              dataset +
+              " dataset.",
+            true
+          );
         }
       } else {
-        this._addMessageToState("Sorry, we can't find that dataset.");
+        this._addMessageToState("Sorry, we can't find that dataset.", true);
       }
     }
   }
@@ -263,13 +305,13 @@ export class Chat extends Component {
         this.props.removeDataset(dataset);
       } else {
         // Everything
-        this._getAllDatasets().forEach((datasetObj) => {
+        this._getAllDatasets().forEach(datasetObj => {
           this.props.removeDataset(datasetObj.id);
         });
       }
     } else {
       this._removeLastMessage();
-      this._addMessageToState("Sorry, we can't find that dataset.");
+      this._addMessageToState("Sorry, we can't find that dataset.", true);
     }
   }
 
@@ -378,13 +420,17 @@ export class Chat extends Component {
   }
 
   _renderResponses() {
-    return this.state.responses.map((response, i) => (
-      <Response key={i}>{response}</Response>
-    ));
+    return this.state.responses.map((msg, i) =>
+      msg.response ? (
+        <Response key={i}>{msg.text}</Response>
+      ) : (
+        <Message key={i}>{msg.text}</Message>
+      )
+    );
   }
 
   render() {
-    const { inputFormat, outputAsSpeech } = this.props;
+    const { outputAsSpeech } = this.props;
     const { inputText } = this.state;
 
     return (
