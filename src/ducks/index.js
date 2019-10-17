@@ -18,5 +18,7 @@ const reducer = combineReducers({
 export default createStore(
 	reducer,
 	{},
-	applyMiddleware(logger, taskMiddleware, promiseMiddleware)
+	// add logger for redux logging
+	// applyMiddleware(logger, taskMiddleware, promiseMiddleware)
+	applyMiddleware(taskMiddleware, promiseMiddleware)
 );

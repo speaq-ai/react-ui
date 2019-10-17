@@ -37,10 +37,11 @@ export async function checkSession() {
 	}
 }
 
-export async function sendMessage(inputText) {
+export async function sendMessage(input, config) {
 	try {
 		const res = await axios.post("message/", {
-			inputText,
+			input,
+			config,
 		});
 		return JSON.parse(res.data);
 	} catch (e) {
