@@ -9,10 +9,11 @@ import styled from "styled-components";
 import { Chat } from "@/components/chat";
 import { AutoSizer } from "react-virtualized";
 import FloatingButton from "@/components/common/floating-button";
+import { AudioRecorder, blobToBase64 } from "@/utils/audio";
 import {
 	LogOut,
 	Mic,
-	MicOff,
+	Square,
 	Volume2,
 	VolumeX,
 	ArrowLeft,
@@ -36,11 +37,15 @@ const NavContainer = styled.div`
 
 const Logo = styled.div`
 	background-color: #15a5fa;
+	border-radius: 100px;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: contain;
-	width: 30px;
-	height: 30px;
+	color: #fff;
+	font-size: 18px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	padding: 3px 10px;
 `;
 
 const MapContainer = styled.div`
@@ -93,8 +98,11 @@ export default class Visualizer extends Component {
 
 	state = {
 		chatPanelOpen: true,
-		inputFormat: "text",
+		inputSpeech: null,
+		mimeType: null,
 		outputAsSpeech: false,
+		audioRecorder: new AudioRecorder(),
+		isRecording: false,
 	};
 
 	componentDidMount() {
@@ -102,22 +110,47 @@ export default class Visualizer extends Component {
 		toggleSidePanel();
 	}
 
+	_handleAudioRecording = async () => {
+		const { audioRecorder, isRecording } = this.state;
+		if (isRecording) {
+			const [audioBlob, mimeType] = await audioRecorder.stop();
+			const inputSpeech = await blobToBase64(audioBlob);
+			this.setState({ inputSpeech, mimeType, isRecording: false });
+		} else {
+			await audioRecorder.record();
+			this.setState({ isRecording: true });
+		}
+	};
+
+	_onInputSpeechSent = () => {
+		this.setState({ inputSpeech: null });
+	};
+
 	render() {
 		const mapboxAccessToken = process.env.MAPBOX_ACCESS_TOKEN;
 		const { logout } = this.props;
-		const { chatPanelOpen, inputFormat, outputAsSpeech } = this.state;
+		const {
+			chatPanelOpen,
+			inputSpeech,
+			mimeType,
+			audioRecorder,
+			outputAsSpeech,
+			isRecording,
+		} = this.state;
 		const iconSize = 16;
 		const buttonSize = 36;
 		return (
 			<div>
 				<NavContainer>
-					<Logo />
+					<Logo>speaqAI</Logo>
 					<LogOut color="white" size="20" onClick={logout} />
 				</NavContainer>
 				<MainContainer>
 					<ChatContainer open={chatPanelOpen}>
 						<Chat
-							inputFormat={inputFormat}
+							inputSpeech={inputSpeech}
+							mimeType={mimeType}
+							onInputSpeechSent={this._onInputSpeechSent}
 							outputAsSpeech={outputAsSpeech}
 							{...this.props}
 						/>
@@ -158,19 +191,12 @@ export default class Visualizer extends Component {
 										</FloatingButton>
 
 										<FloatingButton
-											backgroundColor={
-												inputFormat === "text" ? "#6A7485" : "#F27E64"
-											}
+											backgroundColor={isRecording ? "#F27E64" : "#6A7485"}
 											size={buttonSize}
-											onClick={e =>
-												this.setState({
-													inputFormat:
-														inputFormat === "text" ? "speech" : "text",
-												})
-											}
+											onClick={this._handleAudioRecording}
 										>
-											{inputFormat === "text" ? (
-												<MicOff color="white" size={iconSize} />
+											{isRecording ? (
+												<Square color="white" size={iconSize} />
 											) : (
 												<Mic color="white" size={iconSize} />
 											)}
