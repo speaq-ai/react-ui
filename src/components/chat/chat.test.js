@@ -44,14 +44,14 @@ describe("<Chat />", () => {
     const response = "Response";
     const input = wrapper.find(MessageInput);
     const preventDefault = jest.fn(); // Pretends to be event
-    const expectedResponseLength = wrapper.state().responses.length + 1;
+    const expectedResponseLength = wrapper.state().responses.length + 2;
 
     sendMessage.mockResolvedValue({ text: response });
 
     input.simulate("change", { target: { value: message } });
     await wrapper.instance()._sendMessage({ preventDefault });
     expect(wrapper.state().responses.length).toBe(expectedResponseLength);
-    expect(wrapper.state().responses[0]).toBe(response);
+    expect(wrapper.state().responses[1].text).toBe(response);
   });
 
   it("When a new response is received, a new <Response> should appear", async () => {
@@ -59,7 +59,7 @@ describe("<Chat />", () => {
     const response = "Response";
     const input = wrapper.find(MessageInput);
     const preventDefault = jest.fn(); // Pretends to be event
-    const expectedResponseLength = wrapper.state().responses.length + 1;
+    const expectedResponseLength = wrapper.state().responses.length + 2;
 
     sendMessage.mockResolvedValue({ text: response });
 
@@ -67,7 +67,7 @@ describe("<Chat />", () => {
     expect(wrapper.find(Response)).toHaveLength(0);
     await wrapper.instance()._sendMessage({ preventDefault });
     expect(wrapper.state().responses.length).toBe(expectedResponseLength);
-    expect(wrapper.state().responses[0]).toBe(response);
+    expect(wrapper.state().responses[1].text).toBe(response);
     expect(wrapper.find(Response)).toHaveLength(1);
     expect(
       wrapper
