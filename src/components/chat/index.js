@@ -152,7 +152,7 @@ export class Chat extends Component {
         break;
 
       case this.ActionKeys.GotoAction:
-        this._moveMap(res.variables.lat, res.variables.long);
+        this._moveMap(res.variables.location[0], res.variables.location[1]);
         break;
     }
   };
