@@ -94,6 +94,7 @@ export class Chat extends Component {
     Clear: "Clear",
     ChangeViewMode: "ChangeViewMode",
     ViewAction: "ViewAction",
+    GotoAction: "GotoAction",
   };
 
   state = {
@@ -183,6 +184,10 @@ export class Chat extends Component {
       case this.ActionKeys.ViewAction:
         this._executeViewAction(res.variables.view_action);
         break;
+
+      case this.ActionKeys.GotoAction:
+        this._moveMap(res.variables.location[0], res.variables.location[1]);
+        break;
     }
   };
 
@@ -199,12 +204,6 @@ export class Chat extends Component {
     });
     this.setState({ responses });
   }
-
-  // NOTE: uncomment to demo functionality without having to talk to watson
-  // async componentDidMount() {
-  //   await this._loadDataset("name");
-  //   await this._addFilter("beds", 4, "lt");
-  // }
 
   /*
    * ONLY WORKS FOR NUMERICS CURRENTLY
@@ -417,6 +416,10 @@ export class Chat extends Component {
         await this.props.updateMap({ zoom: mapState.zoom * 1.5 });
         break;
     }
+  }
+
+  _moveMap(lat, long) {
+    this.props.updateMap({latitude: lat, longitude: long});
   }
 
   _renderResponses() {
