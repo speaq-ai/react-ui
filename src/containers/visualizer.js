@@ -15,10 +15,10 @@ class VisualizerContainer extends Component {
 
 const mapStateToProps = state => state;
 
-const mapDispatchToProps = {
+const mapDispatchToProps = (dispatch, props) => ({
 	logout: userActions.logout,
-	...keplerActions,
-};
+	dispatch,
+});
 
 export default connect(
 	mapStateToProps,

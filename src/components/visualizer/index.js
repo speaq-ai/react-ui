@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import KeplerGl from "kepler.gl";
-import { addDataToMap } from "kepler.gl/actions";
+import { toggleSidePanel } from "kepler.gl/actions";
 import { processCsvData } from "kepler.gl/processors";
 import store from "@/ducks";
 import { sendMessage } from "@/utils/speaq-api";
@@ -106,8 +106,7 @@ export default class Visualizer extends Component {
 	};
 
 	componentDidMount() {
-		const { toggleSidePanel } = this.props;
-		toggleSidePanel();
+		this.props.dispatch(toggleSidePanel())
 	}
 
 	_handleAudioRecording = async () => {
