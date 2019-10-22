@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { sendMessage } from "@/utils/speaq-api";
 import { processCsvData } from "kepler.gl/processors";
+import { setFilter, addDataToMap, togglePerspective, layerTypeChange, updateMap, removeDataset } from "kepler.gl/actions";
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
 import FileSaver from "file-saver";
@@ -272,18 +273,15 @@ export class Chat extends Component {
   }
 
   async _setGtFilter(filterId, value) {
-    const { setFilter } = this.props;
-    await setFilter(filterId, "value", [value, Number.MAX_SAFE_INTEGER]);
+    this.props.dispatch(setFilter(filterId, "value", [value, Number.MAX_SAFE_INTEGER]));
   }
 
   async _setLtFilter(filterId, value) {
-    const { setFilter } = this.props;
-    await setFilter(filterId, "value", [Number.MIN_SAFE_INTEGER, value]);
+    this.props.dispatch(setFilter(filterId, "value", [Number.MIN_SAFE_INTEGER, value]));
   }
 
   async _setEqFilter(filterId, value) {
-    const { setFilter } = this.props;
-    await setFilter(filterId, "value", [value, value]);
+    this.props.dispatch(setFilter(filterId, "value", [value, value]));
   }
 
   _resolveField(field) {
@@ -301,11 +299,11 @@ export class Chat extends Component {
   _clearDataset(dataset) {
     if (this._validateDatasetExists(dataset)) {
       if (dataset != "Everything") {
-        this.props.removeDataset(dataset);
+        this.props.dispatch(removeDataset(dataset));
       } else {
         // Everything
         this._getAllDatasets().forEach(datasetObj => {
-          this.props.removeDataset(datasetObj.id);
+          this.props.dispatch(removeDataset(datasetObj.id));
         });
       }
     } else {
@@ -317,7 +315,7 @@ export class Chat extends Component {
   async _loadDataset(datasetName) {
     var data = this._resolveDataset(datasetName);
 
-    await this.props.addDataToMap({
+    this.props.dispatch(addDataToMap({
       datasets: [
         {
           info: {
@@ -327,7 +325,7 @@ export class Chat extends Component {
           data: processCsvData(data),
         },
       ],
-    });
+    }));
   }
 
   _resolveDataset(datasetName) {
@@ -341,7 +339,7 @@ export class Chat extends Component {
 
   // return as an array
   _getAllDatasets() {
-    const { removeDataset, keplerGl } = this.props;
+    const { keplerGl } = this.props;
     const { visState } = keplerGl.foo;
     return Object.values(visState.datasets);
   }
@@ -370,22 +368,22 @@ export class Chat extends Component {
     switch (viewMode) {
       case 3: // Watson strips the D for some reason
       case "3D":
-        await this.props.togglePerspective();
+        await this.props.dispatch(togglePerspective());
         break;
       case "cluster":
-        await this.props.layerTypeChange(layers[0], "cluster");
+        await this.props.dispatch(layerTypeChange(layers[0], "cluster"));
         break;
       case "point":
-        await this.props.layerTypeChange(layers[0], "point");
+        await this.props.dispatch(layerTypeChange(layers[0], "point"));
         break;
       case "grid":
-        await this.props.layerTypeChange(layers[0], "grid");
+        await this.props.dispatch(layerTypeChange(layers[0], "grid"));
         break;
       case "hexbin":
-        await this.props.layerTypeChange(layers[0], "hexagon");
+        await this.props.dispatch(layerTypeChange(layers[0], "hexagon"));
         break;
       case "heatmap":
-        await this.props.layerTypeChange(layers[0], "heatmap");
+        await this.props.dispatch(layerTypeChange(layers[0], "heatmap"));
         break;
     }
   }
@@ -395,31 +393,31 @@ export class Chat extends Component {
 
     switch (viewAction) {
       case "in":
-        await this.props.updateMap({ zoom: mapState.zoom * 1.1 });
+        await this.props.dispatch(updateMap({ zoom: mapState.zoom * 1.1 }));
         break;
       case "out":
-        await this.props.updateMap({ zoom: mapState.zoom * 0.9 });
+        await this.props.dispatch(updateMap({ zoom: mapState.zoom * 0.9 }));
         break;
       case "up":
-        await this.props.updateMap({ latitude: mapState.latitude + 1 / mapState.zoom });
+        await this.props.dispatch(updateMap({ latitude: mapState.latitude + 1 / mapState.zoom }));
         break;
       case "down":
-        await this.props.updateMap({ latitude: mapState.latitude - 1 / mapState.zoom });
+        await this.props.dispatch(updateMap({ latitude: mapState.latitude - 1 / mapState.zoom }));
         break;
       case "right":
-        await this.props.updateMap({ longitude: mapState.longitude + 1 / mapState.zoom });
+        await this.props.dispatch(updateMap({ longitude: mapState.longitude + 1 / mapState.zoom }));
         break;
       case "left":
-        await this.props.updateMap({ longitude: mapState.longitude - 1 / mapState.zoom });
+        await this.props.dispatch(updateMap({ longitude: mapState.longitude - 1 / mapState.zoom }));
         break;
       case "enhance":
-        await this.props.updateMap({ zoom: mapState.zoom * 1.5 });
+        await this.props.dispatch(updateMap({ zoom: mapState.zoom * 1.5 }));
         break;
     }
   }
 
   _moveMap(lat, long) {
-    this.props.updateMap({latitude: lat, longitude: long});
+    this.props.dispatch(updateMap({latitude: lat, longitude: long}));
   }
 
   _renderResponses() {
