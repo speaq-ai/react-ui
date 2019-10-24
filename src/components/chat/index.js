@@ -178,7 +178,7 @@ export class Chat extends Component {
         break;
 
       case this.ActionKeys.ChangeViewMode:
-        this._changeViewMode(res.variables.view_mode);
+        this._changeViewMode(res.variables.dataset_name, res.variables.view_mode);
         break;
 
       case this.ActionKeys.ViewAction:
@@ -347,9 +347,9 @@ export class Chat extends Component {
   }
 
   _validateDatasetExists(datasetName) {
-    const datasets = this._getAllDatasets();
-
     if (datasetName == "Everything") return true;
+
+    const datasets = this._getAllDatasets();
     return datasets.find(dataset => dataset.id == datasetName) ? true : false;
   }
 
@@ -364,29 +364,43 @@ export class Chat extends Component {
     }
   }
 
-  async _changeViewMode(viewMode) {
-    const layers = this.props.keplerGl.foo.visState.layers;
+  async _changeViewMode(dataset, viewMode) {
+    if (this._validateDatasetExists(dataset)) {
+      if (dataset != "Everything") {
+        const layers = this.props.keplerGl.foo.visState.layers;
 
-    switch (viewMode) {
-      case 3: // Watson strips the D for some reason
-      case "3D":
-        await this.props.togglePerspective();
-        break;
-      case "cluster":
-        await this.props.layerTypeChange(layers[0], "cluster");
-        break;
-      case "point":
-        await this.props.layerTypeChange(layers[0], "point");
-        break;
-      case "grid":
-        await this.props.layerTypeChange(layers[0], "grid");
-        break;
-      case "hexbin":
-        await this.props.layerTypeChange(layers[0], "hexagon");
-        break;
-      case "heatmap":
-        await this.props.layerTypeChange(layers[0], "heatmap");
-        break;
+        const layer = layers.find(l => l.config.dataId == dataset);
+
+        switch (viewMode) {
+          case 3: // Watson strips the D for some reason
+          case "3D":
+            await this.props.togglePerspective();
+            break;
+          case "cluster":
+            await this.props.layerTypeChange(layer, "cluster");
+            break;
+          case "point":
+            await this.props.layerTypeChange(layer, "point");
+            break;
+          case "grid":
+            await this.props.layerTypeChange(layer, "grid");
+            break;
+          case "hexbin":
+            await this.props.layerTypeChange(layer, "hexagon");
+            break;
+          case "heatmap":
+            await this.props.layerTypeChange(layer, "heatmap");
+            break;
+        }
+      } else {
+        // Everything
+        this._getAllDatasets().forEach(datasetObj => {
+          this._changeViewMode(datasetObj.id, viewMode);
+        });
+      }
+    } else {
+      this._removeLastMessage();
+      this._addMessageToState("Sorry, we can't find that dataset.", true);
     }
   }
 
