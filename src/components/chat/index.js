@@ -369,7 +369,7 @@ export class Chat extends Component {
       if (dataset != "Everything") {
         const layers = this.props.keplerGl.foo.visState.layers;
 
-        const layer = layers.find(l => l.dataset == dataset);
+        const layer = layers.find(l => l.config.dataId == dataset);
 
         switch (viewMode) {
           case 3: // Watson strips the D for some reason
