@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { sendMessage } from "@/utils/speaq-api";
-import { processCsvData } from "kepler.gl/processors";
-import { setFilter, addDataToMap, togglePerspective, layerTypeChange, updateMap, removeDataset } from "kepler.gl/actions";
-import sacramentoRealEstate from "../../data/SacramentoRealEstate";
-import earthquake from "../../data/Earthquake";
-import FileSaver from "file-saver";
 import { Send } from "react-feather";
-import { base64ToBlob, blobToBase64, AudioRecorder } from "@/utils/audio";
+import ActionProcessor from "./action-processor";
+import { playBase64Audio } from "@/utils/audio";
+
 export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -89,22 +86,16 @@ const HeadingContainer = styled.div`
 `;
 
 export class Chat extends Component {
-  ActionKeys = {
-    AddFilter: "AddFilter",
-    LoadDataset: "LoadData",
-    Clear: "Clear",
-    ChangeViewMode: "ChangeViewMode",
-    ViewAction: "ViewAction",
-    GotoAction: "GotoAction",
-  };
-
-  state = {
-    inputText: "",
-    responses: [],
-  };
-
   constructor(props) {
     super(props);
+    this.state = {
+      inputText: "",
+      responses: [],
+      actionProcessor: new ActionProcessor(
+        this.props.keplerGl,
+        this.props.dispatch
+      ),
+    };
   }
 
   componentDidUpdate(oldProps) {
@@ -112,312 +103,68 @@ export class Chat extends Component {
     if (!oldProps.inputSpeech && !!this.props.inputSpeech) {
       this._sendMessage();
     }
+    if (oldProps.keplerGl !== this.props.keplerGl) {
+      this.state.actionProcessor.updateKepler(this.props.keplerGl);
+    }
   }
 
-  _playSpeechAudio = speech => {
-    const speechBlob = base64ToBlob(speech);
-    const speechUrl = URL.createObjectURL(speechBlob);
-    const speechAudio = new Audio(speechUrl);
-    speechAudio.play();
-  };
-
   _sendMessage = async e => {
+    e && e.preventDefault();
     const {
       outputAsSpeech,
       inputSpeech,
       mimeType,
       onInputSpeechSent,
     } = this.props;
-    const { inputText } = this.state;
-    e && e.preventDefault();
-    let res;
-    if (!!inputSpeech) {
-      res = await sendMessage(inputSpeech, {
-        inputFormat: "speech",
-        outputAsSpeech,
-        mimeType,
-      });
-      onInputSpeechSent();
-    } else {
+    const { inputText, actionProcessor } = this.state;
+
+    const messageContent = !!inputSpeech ? inputSpeech : inputText;
+    const messageConfig = {
+      inputFormat: !!inputSpeech ? "speech" : "text",
+      outputAsSpeech,
+      mimeType,
+    };
+
+    if (!inputSpeech) {
       this.setState({
         inputText: "",
       });
-      await this._addMessageToState(inputText, false);
-      this._addMessageToState("...", true);
-      res = await sendMessage(inputText, {
-        inputFormat: "text",
-        outputAsSpeech,
-      });
-      this._removeLastMessage();
+      this._addMessagesToState([
+        { text: inputText, isResponse: false },
+        { text: "...", isResponse: true },
+      ]);
+    } else {
+      this._addMessagesToState([
+        { text: "...", isResponse: false },
+        { text: "...", isResponse: true },
+      ]);
+      onInputSpeechSent();
     }
-    this._addMessageToState(res.text ? res.text : "no response...", true);
-
+    const res = await sendMessage(messageContent, messageConfig);
+    this._addMessagesToState(
+      [{ text: res.text ? res.text : "no response...", isResponse: true }],
+      { remove: 1 }
+    );
     if (outputAsSpeech) {
-      this._playSpeechAudio(res.speech);
+      this.playBase64Audio(res.speech);
     }
-
-    switch (res.action) {
-      case null:
-        // do nothing
-        break;
-
-      case this.ActionKeys.AddFilter:
-        this._addFilter(
-          res.variables.filter_field,
-          res.variables.sys_number,
-          res.variables.filter_comparison,
-          res.variables.dataset_name
-        );
-        break;
-
-      case this.ActionKeys.LoadDataset:
-        this._loadDataset(res.variables.dataset_name);
-        break;
-
-      case this.ActionKeys.Clear:
-        this._clearDataset(res.variables.dataset_name);
-        break;
-
-      case this.ActionKeys.ChangeViewMode:
-        this._changeViewMode(res.variables.view_mode);
-        break;
-
-      case this.ActionKeys.ViewAction:
-        this._executeViewAction(res.variables.view_action);
-        break;
-
-      case this.ActionKeys.GotoAction:
-        this._moveMap(res.variables.location[0], res.variables.location[1]);
-        break;
-    }
+    const responses = await actionProcessor.process(res);
+    const messages = responses.map(response => ({
+      text: response,
+      isResponse: true,
+    }));
+    messages.length && this._addMessagesToState(messages, { remove: 1 });
   };
 
-  // Right now, this is used essentially every time before we add a new message
-  // however, i feel like including this in the add message code is asking for confusion down the line
-  _removeLastMessage() {
-    this.setState({ responses: this.state.responses.slice(0, -1) });
-  }
-
-  _addMessageToState(message, isResponse) {
-    const responses = this.state.responses.concat({
-      response: isResponse,
-      text: message,
-    });
+  _addMessagesToState(messages, options = { remove: 0 }) {
+    let responses = this.state.responses.slice(
+      0,
+      this.state.responses.length - (options.remove ? options.remove : 0)
+    );
+    responses = responses.concat(
+      messages.map(msg => ({ text: msg.text, response: msg.isResponse }))
+    );
     this.setState({ responses });
-  }
-
-  /*
-   * ONLY WORKS FOR NUMERICS CURRENTLY
-   * Taking actions below.
-   * add filter takes the following arguments:
-   * field: filed name to create the filter for
-   * value: the value to use in the filter comparison
-   * comparator: one of {"gt", "lt", "eq"}
-   * dataset: TODO: lookup id if provided, else use
-   * most recently loaded dataset ID.
-   */
-  async _addFilter(field, value, comparator, dataset) {
-    // generally, we let watson append the success message, but as filter-everything can result
-    // in multiple successes and failures, we want to remove only the watson response, and then append a result for
-    // each filter processed.
-    this._removeLastMessage();
-
-    if (dataset == "Everything") {
-      this._getAllDatasets().forEach(datasetObj => {
-        this._addMessageToState("adding filter...", true);
-        this._addFilter(field, value, comparator, datasetObj.id);
-      });
-    } else {
-      // validation
-      if (this._validateDatasetExists(dataset)) {
-        if (this._validateField(dataset, field)) {
-          const { addFilter, setFilter, keplerGl } = this.props;
-          const { visState } = keplerGl.foo;
-          const datasetId = dataset || Object.values(visState.datasets)[0].id;
-          const filterId = visState.filters.length;
-
-          await addFilter(datasetId);
-          // get the ID of the filter we just added
-          await setFilter(filterId, "name", this._resolveField(field));
-
-          switch (comparator) {
-            case "greater than":
-              await this._setGtFilter(filterId, value);
-              break;
-            case "less than":
-              await this._setLtFilter(filterId, value);
-              break;
-            case "equal":
-              await this._setEqFilter(filterId, value);
-              break;
-            default:
-              // do nothing
-              // TODO: change this in the future. For our MVP demo, we can default to less than
-              await this._setLtFilter(filterId, value); // feel free to make this greater than or whatever @ jamie for our demo script
-              break;
-          }
-
-          this._addMessageToState("Great, let's get that filter going.", true);
-        } else {
-          this._addMessageToState(
-            "That doesn't look like a valid field on the " +
-              dataset +
-              " dataset.",
-            true
-          );
-        }
-      } else {
-        this._addMessageToState("Sorry, we can't find that dataset.", true);
-      }
-    }
-  }
-
-  async _setGtFilter(filterId, value) {
-    this.props.dispatch(setFilter(filterId, "value", [value, Number.MAX_SAFE_INTEGER]));
-  }
-
-  async _setLtFilter(filterId, value) {
-    this.props.dispatch(setFilter(filterId, "value", [Number.MIN_SAFE_INTEGER, value]));
-  }
-
-  async _setEqFilter(filterId, value) {
-    this.props.dispatch(setFilter(filterId, "value", [value, value]));
-  }
-
-  _resolveField(field) {
-    var fieldMap = {
-      price: "price",
-      beds: "beds",
-      baths: "baths",
-      year: "year",
-      magnitude: "magnitude",
-      depth: "depth",
-    };
-    return fieldMap[field];
-  }
-
-  _clearDataset(dataset) {
-    if (this._validateDatasetExists(dataset)) {
-      if (dataset != "Everything") {
-        this.props.dispatch(removeDataset(dataset));
-      } else {
-        // Everything
-        this._getAllDatasets().forEach(datasetObj => {
-          this.props.dispatch(removeDataset(datasetObj.id));
-        });
-      }
-    } else {
-      this._removeLastMessage();
-      this._addMessageToState("Sorry, we can't find that dataset.", true);
-    }
-  }
-
-  async _loadDataset(datasetName) {
-    var data = this._resolveDataset(datasetName);
-
-    this.props.dispatch(addDataToMap({
-      datasets: [
-        {
-          info: {
-            label: datasetName,
-            id: datasetName,
-          },
-          data: processCsvData(data),
-        },
-      ],
-    }));
-  }
-
-  _resolveDataset(datasetName) {
-    var datasetMap = {
-      Earthquake: earthquake,
-      "Sacramento real estate": sacramentoRealEstate,
-    };
-
-    return datasetMap[datasetName];
-  }
-
-  // return as an array
-  _getAllDatasets() {
-    const { keplerGl } = this.props;
-    const { visState } = keplerGl.foo;
-    return Object.values(visState.datasets);
-  }
-
-  _validateDatasetExists(datasetName) {
-    const datasets = this._getAllDatasets();
-
-    if (datasetName == "Everything") return true;
-    return datasets.find(dataset => dataset.id == datasetName) ? true : false;
-  }
-
-  _validateField(datasetName, field) {
-    const datasets = this._getAllDatasets();
-    const dataset = datasets.find(dataset => dataset.id == datasetName);
-
-    if (dataset) {
-      return dataset.fields.find(f => f.name == field) ? true : false;
-    } else {
-      return false;
-    }
-  }
-
-  async _changeViewMode(viewMode) {
-    const layers = this.props.keplerGl.foo.visState.layers;
-
-    switch (viewMode) {
-      case 3: // Watson strips the D for some reason
-      case "3D":
-        await this.props.dispatch(togglePerspective());
-        break;
-      case "cluster":
-        await this.props.dispatch(layerTypeChange(layers[0], "cluster"));
-        break;
-      case "point":
-        await this.props.dispatch(layerTypeChange(layers[0], "point"));
-        break;
-      case "grid":
-        await this.props.dispatch(layerTypeChange(layers[0], "grid"));
-        break;
-      case "hexbin":
-        await this.props.dispatch(layerTypeChange(layers[0], "hexagon"));
-        break;
-      case "heatmap":
-        await this.props.dispatch(layerTypeChange(layers[0], "heatmap"));
-        break;
-    }
-  }
-
-  async _executeViewAction(viewAction) {
-    const mapState = this.props.keplerGl.foo.mapState;
-
-    switch (viewAction) {
-      case "in":
-        await this.props.dispatch(updateMap({ zoom: mapState.zoom * 1.1 }));
-        break;
-      case "out":
-        await this.props.dispatch(updateMap({ zoom: mapState.zoom * 0.9 }));
-        break;
-      case "up":
-        await this.props.dispatch(updateMap({ latitude: mapState.latitude + 1 / mapState.zoom }));
-        break;
-      case "down":
-        await this.props.dispatch(updateMap({ latitude: mapState.latitude - 1 / mapState.zoom }));
-        break;
-      case "right":
-        await this.props.dispatch(updateMap({ longitude: mapState.longitude + 1 / mapState.zoom }));
-        break;
-      case "left":
-        await this.props.dispatch(updateMap({ longitude: mapState.longitude - 1 / mapState.zoom }));
-        break;
-      case "enhance":
-        await this.props.dispatch(updateMap({ zoom: mapState.zoom * 1.5 }));
-        break;
-    }
-  }
-
-  _moveMap(lat, long) {
-    this.props.dispatch(updateMap({latitude: lat, longitude: long}));
   }
 
   _renderResponses() {
