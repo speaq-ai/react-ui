@@ -167,7 +167,6 @@ export class Chat extends Component {
     }));
     messages.length &&
       (await this._addMessagesToState(messages, { remove: 1 }));
-    console.log(this.responseContainer);
     if (this.responseContainer) {
       this.responseContainer.scrollTop = this.responseContainer.scrollHeight;
     }
