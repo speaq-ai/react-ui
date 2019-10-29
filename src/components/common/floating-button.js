@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
+import * as Icon from "react-feather";
 
 const Button = styled.button`
 	border-radius: 100%;
@@ -9,8 +10,8 @@ const Button = styled.button`
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
 		Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 	display: block;
-	width: ${props => props.size || "40px"}
-	height: ${props => props.size || "40px"}
+	width: ${props => props.size || "36px"}
+	height: ${props => props.size || "36px"}
 	&:hover {
 		cursor: pointer;
 	}
@@ -21,11 +22,18 @@ const Button = styled.button`
 
 export default class FloatingButton extends Component {
 	render() {
-		const { text, children, ...props } = this.props;
+		const { text, children, activeIcon, icon, active, ...props } = this.props;
+		const iconSize = 16;
+		const DefaultIcon = Icon[icon];
+		const ActiveIcon = Icon[activeIcon];
 		return (
 			<Button {...props}>
 				{text}
-				{children}
+				{active && activeIcon ? (
+					<ActiveIcon size={iconSize} color="#fff" />
+				) : (
+					<DefaultIcon size={iconSize} color="#fff" />
+				)}
 			</Button>
 		);
 	}

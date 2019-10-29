@@ -11,7 +11,7 @@ class App extends Component {
 		this.props.checkSession();
 	}
 	render() {
-		const { authenticated } = this.props;
+		const { authenticated, logout } = this.props;
 		return (
 			<div>
 				{authenticated === null ? (
@@ -21,6 +21,7 @@ class App extends Component {
 						<Route path="/login" component={LoginContainer} />
 						<PrivateRoute
 							path="/dashboard"
+							logout={logout}
 							authenticated={authenticated}
 							component={VisualizerContainer}
 						/>
@@ -50,6 +51,7 @@ function mapStateToProps(state) {
 }
 const mapDispatchToProps = {
 	checkSession: userActions.checkSession,
+	logout: userActions.logout,
 };
 
 export default connect(

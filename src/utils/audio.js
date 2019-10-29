@@ -39,6 +39,13 @@ export class AudioRecorder {
 	};
 }
 
+export function _playBase64Audio(audio) {
+	const speechBlob = base64ToBlob(audio);
+	const speechUrl = URL.createObjectURL(speechBlob);
+	const speechAudio = new Audio(speechUrl);
+	speechAudio.play();
+}
+
 export function base64ToBlob(s) {
 	const byteData = atob(s);
 	const byteNums = new Array(byteData.length);
