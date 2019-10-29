@@ -118,6 +118,10 @@ export class Chat extends Component {
     } = this.props;
     const { inputText, actionProcessor } = this.state;
 
+    if (!inputSpeech && !inputText) {
+      return;
+    }
+
     const messageContent = !!inputSpeech ? inputSpeech : inputText;
     const messageConfig = {
       inputFormat: !!inputSpeech ? "speech" : "text",
@@ -141,10 +145,18 @@ export class Chat extends Component {
       onInputSpeechSent();
     }
     const res = await sendMessage(messageContent, messageConfig);
-    this._addMessagesToState(
-      [{ text: res.text ? res.text : "no response...", isResponse: true }],
-      { remove: 1 }
-    );
+
+    // append user input/response as needed
+    const dialogue = [];
+    if (inputSpeech) {
+      dialogue.push({ text: res.input_text, isResponse: false });
+    }
+    dialogue.push({
+      text: res.text ? res.text : "no response...",
+      isResponse: true,
+    });
+    this._addMessagesToState(dialogue, { remove: dialogue.length });
+
     if (outputAsSpeech) {
       this.playBase64Audio(res.speech);
     }
@@ -153,7 +165,11 @@ export class Chat extends Component {
       text: response,
       isResponse: true,
     }));
-    messages.length && this._addMessagesToState(messages, { remove: 1 });
+    messages.length &&
+      (await this._addMessagesToState(messages, { remove: 1 }));
+    if (this.responseContainer) {
+      this.responseContainer.scrollTop = this.responseContainer.scrollHeight;
+    }
   };
 
   _addMessagesToState(messages, options = { remove: 0 }) {
@@ -183,7 +199,13 @@ export class Chat extends Component {
 
     return (
       <ChatContainer>
-        <ResponseContainer>{this._renderResponses()}</ResponseContainer>
+        <ResponseContainer
+          ref={ref => {
+            this.responseContainer = ref;
+          }}
+        >
+          {this._renderResponses()}
+        </ResponseContainer>
         <MessageForm id="message-form">
           <MessageInput
             type="text"
