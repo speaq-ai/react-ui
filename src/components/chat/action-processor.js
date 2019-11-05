@@ -81,28 +81,46 @@ export default class ActionProcessor {
 		}
 	}
 
+	async _executeOnDataset(action, dataset, ...args) {
+		if (!this._validateDatasetExists(dataset)) {
+			return [ActionProcessor.RESPONSES.INVALID_DATASET];
+		}
+
+		if (dataset == "Everything") {
+			var results = []
+
+			for (const datasetObj of this._getAllDatasets()) {
+				results.push(await action(datasetObj.id, ...args))
+			}
+
+			return results
+		} else {
+			return await action(dataset, ...args)
+		}
+	}
+
 	process = async res => {
 		const { ACTION_KEYS } = ActionProcessor;
 		switch (res.action) {
 			case ACTION_KEYS.ADD_FILTER:
-				return await this._addFilter(
+				return await this._executeOnDataset(
+					this._addFilter,
+					res.variables.dataset_name,
 					res.variables.filter_field,
 					res.variables.sys_number,
-					res.variables.filter_comparison,
-					res.variables.dataset_name
-				);
+					res.variables.filter_comparison)
 
 			case ACTION_KEYS.LOAD_DATASET:
-				return this._loadDataset(res.variables.dataset_name);
+				return this._loadDataset(res.variables.dataset_name)
 
 			case ACTION_KEYS.CLEAR:
-				return this._clearDataset(res.variables.dataset_name);
+				return await this._executeOnDataset(this._clearDataset, res.variables.dataset_name)
 
 			case ACTION_KEYS.CHANGE_VIEW_MODE:
-				return this._changeViewMode(res.variables.view_mode);
+				return await this._executeOnDataset(this._changeViewMode, res.variables.dataset_name, res.variables.view_mode)
 
 			case ACTION_KEYS.VIEW_ACTION:
-				return this._executeViewAction(res.variables.view_action);
+				return await this._executeViewAction(res.variables.view_action);
 
 			case ACTION_KEYS.GOTO_ACTION:
 				return this._moveMap(
@@ -124,21 +142,8 @@ export default class ActionProcessor {
 	 * dataset: TODO: lookup id if provided, else use
 	 * most recently loaded dataset ID.
 	 */
-	async _addFilter(field, value, comparator, dataset) {
-		if (dataset == "Everything") {
-			const responses = [];
-			this._getAllDatasets().forEach(async datasetObj => {
-				responses.push(
-					await this._addFilter(field, value, comparator, datasetObj.id)
-				);
-			});
-			return responses;
-		}
-
-		// validation
-		if (!this._validateDatasetExists(dataset)) {
-			return [ActionProcessor.RESPONSES.INVALID_DATASET];
-		} else if (!this._validateField(dataset, field)) {
+	_addFilter = async (dataset, field, value, comparator) => {
+		if (!this._validateField(dataset, field)) {
 			return [ActionProcessor.RESPONSES.INVALID_FIELD];
 		}
 
@@ -167,34 +172,24 @@ export default class ActionProcessor {
 		return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
 	}
 
-	async _setGtFilter(filterId, value) {
+	_setGtFilter = async (filterId, value) => {
 		this._dispatch(
 			setFilter(filterId, "value", [value, Number.MAX_SAFE_INTEGER])
 		);
 	}
 
-	async _setLtFilter(filterId, value) {
+	_setLtFilter = async (filterId, value) => {
 		this._dispatch(
 			setFilter(filterId, "value", [Number.MIN_SAFE_INTEGER, value])
 		);
 	}
 
-	async _setEqFilter(filterId, value) {
+	_setEqFilter = async (filterId, value) => {
 		this._dispatch(setFilter(filterId, "value", [value, value]));
 	}
 
-	_clearDataset(dataset) {
-		if (!this._validateDatasetExists(dataset)) {
-			return [ActionProcessor.RESPONSES.INVALID_DATASET];
-		}
-		if (dataset != "Everything") {
-			this._dispatch(removeDataset(dataset));
-		} else {
-			// Everything
-			this._getAllDatasets().forEach(datasetObj => {
-				this._dispatch(removeDataset(datasetObj.id));
-			});
-		}
+	_clearDataset = (dataset) => {
+		this._dispatch(removeDataset(dataset));
 		return [];
 	}
 
@@ -216,8 +211,10 @@ export default class ActionProcessor {
 		return [];
 	}
 
-	_changeViewMode(viewMode) {
+	_changeViewMode = (dataset, viewMode) => {
 		const layers = this._keplerGl.foo.visState.layers;
+
+		const layer = layers.find(l => l.config.dataId == dataset);
 
 		switch (viewMode) {
 			case 3: // Watson strips the D for some reason
@@ -225,21 +222,22 @@ export default class ActionProcessor {
 				this._dispatch(togglePerspective());
 				break;
 			case "cluster":
-				this._dispatch(layerTypeChange(layers[0], "cluster"));
+				this._dispatch(layerTypeChange(layer, "cluster"));
 				break;
 			case "point":
-				this._dispatch(layerTypeChange(layers[0], "point"));
+				this._dispatch(layerTypeChange(layer, "point"));
 				break;
 			case "grid":
-				this._dispatch(layerTypeChange(layers[0], "grid"));
+				this._dispatch(layerTypeChange(layer, "grid"));
 				break;
 			case "hexbin":
-				this._dispatch(layerTypeChange(layers[0], "hexagon"));
+				this._dispatch(layerTypeChange(layer, "hexagon"));
 				break;
 			case "heatmap":
-				this._dispatch(layerTypeChange(layers[0], "heatmap"));
+				this._dispatch(layerTypeChange(layer, "heatmap"));
 				break;
 		}
+
 		return [];
 	}
 
