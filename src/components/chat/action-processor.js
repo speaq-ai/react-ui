@@ -31,10 +31,12 @@ export default class ActionProcessor {
 		INVALID_FIELD: dataset =>
 			`That doesn't look like a valid field on the ${dataset} dataset.`,
 		SUCCESS_FILTER: "Great, let's get that filter going.",
+		SUCCESS_GENERAL: "Okay, we can do that."
 	};
 
 	// static resolution methods
 	static _resolveDataset(datasetName) {
+		console.log(datasetName)
 		var datasetMap = {
 			Earthquake: earthquake,
 			"Sacramento real estate": sacramentoRealEstate,
@@ -190,7 +192,7 @@ export default class ActionProcessor {
 
 	_clearDataset = (dataset) => {
 		this._dispatch(removeDataset(dataset));
-		return [];
+		return [ActionProcessor.RESPONSES.SUCCESS_GENERAL];
 	}
 
 	_loadDataset(datasetName) {
