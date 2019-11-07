@@ -8,6 +8,7 @@ import {
   MessageButton,
   MessageInput,
 } from "./index";
+import ActionProcessor from "./action-processor"
 import { sendMessage } from "@/utils/speaq-api";
 
 jest.mock("@/utils/speaq-api"); // Automock speaq-api methods, define implmentation in tests
@@ -17,6 +18,7 @@ describe("<Chat />", () => {
 
   beforeEach(() => {
     wrapper = shallow(<Chat />);
+    const _getAllDatasets = ActionProcessor.prototype._getAllDatasets = jest.fn().mockImplementation(() => []);
   });
 
   it("Should update the state when text is input", () => {
