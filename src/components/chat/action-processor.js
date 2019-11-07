@@ -36,13 +36,18 @@ export default class ActionProcessor {
 	};
 
 	// static resolution methods
+	// returns -1 if bad dataset name
 	static _resolveDataset(datasetName) {
 		var datasetMap = {
 			Earthquake: earthquake,
 			"Sacramento real estate": sacramentoRealEstate,
 		};
 
-		return datasetMap[datasetName];
+		if (datasetName in datasetMap) {
+			return datasetMap[datasetName]
+		} else {
+			return -1
+		}
 	}
 	static _resolveField(field) {
 		var fieldMap = {
@@ -61,6 +66,9 @@ export default class ActionProcessor {
 	}
 
 	// validation helper methods
+
+	// get all datasets which are currently loaded in the kepler instance - not all that
+	// could be loaded.
 	_getAllDatasets() {
 		const { visState } = this._keplerGl.foo;
 		return Object.values(visState.datasets);
@@ -197,6 +205,11 @@ export default class ActionProcessor {
 
 	_loadDataset(datasetName) {
 		const data = ActionProcessor._resolveDataset(datasetName);
+
+		if (data === -1) {
+			return [ActionProcessor.RESPONSES.INVALID_DATASET]
+		}
+
 		this._dispatch(
 			addDataToMap({
 				datasets: [
@@ -210,6 +223,7 @@ export default class ActionProcessor {
 				],
 			})
 		);
+
 		return [];
 	}
 
