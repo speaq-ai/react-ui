@@ -144,7 +144,14 @@ export class Chat extends Component {
       ]);
       onInputSpeechSent();
     }
-    const res = await sendMessage(messageContent, messageConfig);
+
+    // get all datasets to send to api
+    const datasets = actionProcessor._getAllDatasets().map(function (element) {
+      return element.id;
+    });
+
+
+    const res = await sendMessage(messageContent, datasets, messageConfig);
 
     // append user input/response as needed
     const dialogue = [];

@@ -31,6 +31,8 @@ export default class ActionProcessor {
 		INVALID_FIELD: dataset =>
 			`That doesn't look like a valid field on the ${dataset} dataset.`,
 		SUCCESS_FILTER: "Great, let's get that filter going.",
+		SUCCESS_CLEAR: "Okay, let's remove that dataset.",
+		SUCCESS_CHANGE_VIEW: "Alright, changing that for you now!",
 	};
 
 	// static resolution methods
@@ -190,7 +192,7 @@ export default class ActionProcessor {
 
 	_clearDataset = (dataset) => {
 		this._dispatch(removeDataset(dataset));
-		return [];
+		return [ActionProcessor.RESPONSES.SUCCESS_CLEAR];
 	}
 
 	_loadDataset(datasetName) {
@@ -238,7 +240,7 @@ export default class ActionProcessor {
 				break;
 		}
 
-		return [];
+		return [ActionProcessor.RESPONSES.SUCCESS_CHANGE_VIEW];
 	}
 
 	_executeViewAction(viewAction) {

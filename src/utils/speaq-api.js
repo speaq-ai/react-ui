@@ -37,10 +37,13 @@ export async function checkSession() {
 	}
 }
 
-export async function sendMessage(input, config) {
+// datasets is a list of datasets loaded in kepler at the time of sending
+// (before the action is taken)
+export async function sendMessage(input, datasets, config) {
 	try {
 		const res = await axios.post("message/", {
 			input,
+			datasets,
 			config,
 		});
 		return JSON.parse(res.data);
