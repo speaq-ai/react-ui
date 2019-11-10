@@ -179,6 +179,8 @@ export default class ActionProcessor {
 			case "equal":
 				await this._setEqFilter(filterId, value);
 				break;
+			case "range":
+				await this._setRangeFilter(filterId, value[0], value[1]);
 			default:
 				break;
 		}
@@ -194,6 +196,12 @@ export default class ActionProcessor {
 	_setLtFilter = async (filterId, value) => {
 		this._dispatch(
 			setFilter(filterId, "value", [Number.MIN_SAFE_INTEGER, value])
+		);
+	}
+
+	_setRangeFilter = async (filterId, min, max) => {
+		this._dispatch(
+			setFilter(filterId, "value", [min, max])
 		);
 	}
 
