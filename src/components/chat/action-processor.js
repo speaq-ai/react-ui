@@ -24,6 +24,7 @@ export default class ActionProcessor {
 		CHANGE_VIEW_MODE: "ChangeViewMode",
 		VIEW_ACTION: "ViewAction",
 		GOTO_ACTION: "GotoAction",
+		LOCATION_FILTER: "LocationFilter",
 	};
 
 	static RESPONSES = {
@@ -57,6 +58,8 @@ export default class ActionProcessor {
 			year: "year",
 			magnitude: "magnitude",
 			depth: "depth",
+			latitude: "latitude",
+			longitude: "longitude",
 		};
 		return fieldMap[field];
 	}
