@@ -1,5 +1,6 @@
 import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
+import nycAirbnb from "../../data/NYCAirbnb";
 import { processCsvData } from "kepler.gl/processors";
 import {
 	addFilter,
@@ -41,6 +42,7 @@ export default class ActionProcessor {
 		var datasetMap = {
 			Earthquake: earthquake,
 			"Sacramento real estate": sacramentoRealEstate,
+			"New York Airbnb": nycAirbnb,
 		};
 
 		if (datasetName in datasetMap) {
@@ -49,6 +51,7 @@ export default class ActionProcessor {
 			return -1
 		}
 	}
+
 	static _resolveField(field) {
 		var fieldMap = {
 			price: "price",
@@ -57,6 +60,11 @@ export default class ActionProcessor {
 			year: "year",
 			magnitude: "magnitude",
 			depth: "depth",
+			"availability per year": "availability_365",
+			"host listing count": "calculated_host_listings_count",
+			"reviews per month": "reviews_per_month",
+			"number of reviews": "number_of_reviews",
+			"minimum nights": "minimum_nights",
 		};
 		return fieldMap[field];
 	}
@@ -85,7 +93,7 @@ export default class ActionProcessor {
 		const dataset = datasets.find(dataset => dataset.id == datasetName);
 
 		if (dataset) {
-			return dataset.fields.find(f => f.name == field) ? true : false;
+			return dataset.fields.find(f => f.name == ActionProcessor._resolveField(field)) ? true : false;
 		} else {
 			return false;
 		}
@@ -154,7 +162,7 @@ export default class ActionProcessor {
 	 */
 	_addFilter = async (dataset, field, value, comparator) => {
 		if (!this._validateField(dataset, field)) {
-			return [ActionProcessor.RESPONSES.INVALID_FIELD];
+			return [ActionProcessor.RESPONSES.INVALID_FIELD(dataset)];
 		}
 
 		const { visState } = this._keplerGl.foo;
