@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { sendMessage } from "@/utils/speaq-api";
 import { Send } from "react-feather";
 import ActionProcessor from "./action-processor";
-import { playBase64Audio } from "@/utils/audio";
 
 export const ChatContainer = styled.div`
   display: flex;
@@ -146,13 +145,11 @@ export class Chat extends Component {
     }
 
     // get all datasets to send to api
-    const datasets = actionProcessor._getAllDatasets().map(function (element) {
+    const datasets = actionProcessor._getAllDatasets().map(function(element) {
       return element.id;
     });
 
-
     const res = await sendMessage(messageContent, datasets, messageConfig);
-
     // append user input/response as needed
     const dialogue = [];
     if (inputSpeech) {
