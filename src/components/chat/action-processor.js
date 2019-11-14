@@ -2,6 +2,7 @@ import sacramentoRealEstate from "../../data/SacramentoRealEstate";
 import earthquake from "../../data/Earthquake";
 import nycAirbnb from "../../data/NYCAirbnb";
 import { processCsvData } from "kepler.gl/processors";
+import moment from "moment";
 import {
   addFilter,
   setFilter,
@@ -26,6 +27,8 @@ export default class ActionProcessor {
     VIEW_ACTION: "ViewAction",
     GOTO_ACTION: "GotoAction",
     LOCATION_FILTER: "LocationFilter",
+    ADD_FILTER_DATETIME_UNARY: "AddDatetimeFilterUnary",
+    ADD_FILTER_DATETIME_BINARY: "AddDatetimeFilterBinary",
   };
 
   static RESPONSES = {
@@ -68,6 +71,7 @@ export default class ActionProcessor {
       "reviews per month": "reviews_per_month",
       "number of reviews": "number_of_reviews",
       "minimum nights": "minimum_nights",
+      date: "date",
     };
     return fieldMap[field];
   }
@@ -104,6 +108,21 @@ export default class ActionProcessor {
     } else {
       return false;
     }
+  }
+
+  _findDatetimeField(datasetName) {
+    const dataset = this._getAllDatasets().find(
+      dataset => dataset.id == datasetName
+    );
+    if (dataset) {
+      const datetimeField = dataset.fields.find(
+        field => field.type === "timestamp"
+      );
+      if (datetimeField) {
+        return datetimeField.id;
+      }
+    }
+    console.error("Could not find a timestamp field in the targeted datset.");
   }
 
   async _executeOnDataset(action, dataset, ...args) {
@@ -153,6 +172,21 @@ export default class ActionProcessor {
           [longitude - 0.2, longitude + 0.2],
           "range"
         );
+      case ACTION_KEYS.ADD_FILTER_DATETIME_UNARY:
+        return await this._executeOnDataset(
+          this._addDatetimeFilterUnary,
+          res.variables.dataset_name,
+          res.variables.filter_comparison,
+          res.variables.date
+        );
+      case ACTION_KEYS.ADD_FILTER_DATETIME_BINARY:
+        return await this._executeOnDataset(
+          this._addDatetimeFilterBinary,
+          res.variables.dataset_name,
+          res.variables.filter_comparison,
+          res.variables.date_start,
+          res.variables.date_end
+        );
       case ACTION_KEYS.LOAD_DATASET:
         return this._loadDataset(res.variables.dataset_name);
 
@@ -192,16 +226,18 @@ export default class ActionProcessor {
    * dataset: TODO: lookup id if provided, else use
    * most recently loaded dataset ID.
    */
+  _createFilter = async dataset => {
+    const { visState } = this._keplerGl.foo;
+    const datasetId = dataset || Object.values(visState.datasets)[0].id;
+    const filterId = visState.filters.length;
+    await this._dispatch(addFilter(datasetId));
+    return filterId;
+  };
   _addFilter = async (dataset, field, value, comparator) => {
     if (!this._validateField(dataset, field)) {
       return [ActionProcessor.RESPONSES.INVALID_FIELD(dataset)];
     }
-
-    const { visState } = this._keplerGl.foo;
-    const datasetId = dataset || Object.values(visState.datasets)[0].id;
-    const filterId = visState.filters.length;
-
-    await this._dispatch(addFilter(datasetId));
+    const filterId = await this._createFilter(dataset);
     await this._dispatch(
       setFilter(filterId, "name", ActionProcessor._resolveField(field))
     );
@@ -218,9 +254,50 @@ export default class ActionProcessor {
         break;
       case "range":
         await this._setRangeFilter(filterId, value[0], value[1]);
+        break;
       default:
         break;
     }
+    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+  };
+
+  _addDatetimeFilterUnary = async (dataset, comparator, date) => {
+    const datetimeField = this._findDatetimeField(dataset);
+    const filterId = await this._createFilter(dataset);
+    await this._dispatch(setFilter(filterId, "name", datetimeField));
+    let range = [];
+    const dateMs = moment(date).valueOf();
+    switch (comparator) {
+      case "before":
+        range = [0, dateMs];
+        break;
+      case "after":
+        range = [dateMs, new Date().getTime()];
+        break;
+      default:
+        console.error(
+          `Invalid unary datetime comparator detected: ${comparator}`
+        );
+    }
+    await this._dispatch(setFilter(filterId, "value", range));
+    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+  };
+
+  _addDatetimeFilterBinary = async (
+    dataset,
+    comparator,
+    startDate,
+    endDate
+  ) => {
+    const datetimeField = this._findDatetimeField(dataset);
+    const filterId = await this._createFilter(dataset);
+    await this._dispatch(setFilter(filterId, "name", datetimeField));
+    await this._dispatch(
+      setFilter(filterId, "value", [
+        moment(startDate).valueOf(),
+        moment(endDate).valueOf(),
+      ])
+    );
     return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
   };
 
