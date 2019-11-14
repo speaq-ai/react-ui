@@ -130,14 +130,14 @@ export default class ActionProcessor {
 					this._addFilter,
 					res.variables.dataset_name,
 					"latitude",
-					[latitude - 0.3, latitude + 0.3],
+					[latitude - 0.2, latitude + 0.2],
 					"range",
 				)
 				return await this._executeOnDataset(
 					this._addFilter,
 					res.variables.dataset_name,
 					"longitude",
-					[longitude - 0.3 , longitude + 0.3],
+					[longitude - 0.2 , longitude + 0.2],
 					"range",
 				)
 			case ACTION_KEYS.LOAD_DATASET:
