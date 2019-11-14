@@ -257,7 +257,7 @@ export default class ActionProcessor {
         );
     }
     await this._dispatch(setFilter(filterId, "value", range));
-    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+    return []; // [ActionProcessor.RESPONSES.SUCCESS_FILTER];
   };
 
   _addDatetimeFilterBinary = async (
@@ -275,7 +275,7 @@ export default class ActionProcessor {
         moment(endDate).valueOf(),
       ])
     );
-    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+    return []; //[ActionProcessor.RESPONSES.SUCCESS_FILTER];
   };
 
   _setGtFilter = async (filterId, value) => {
