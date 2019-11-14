@@ -124,18 +124,20 @@ export default class ActionProcessor {
 					res.variables.filter_comparison)
 
 			case ACTION_KEYS.LOCATION_FILTER:
+				let [latitude, longitude] = res.variables.location
+
 				await this._executeOnDataset(
 					this._addFilter,
 					res.variables.dataset_name,
 					"latitude",
-					[37, 40],  // TODO: Get min/max longitude from api
+					[latitude - 0.5, latitude + 0.5],
 					"range",
 				)
 				return await this._executeOnDataset(
 					this._addFilter,
 					res.variables.dataset_name,
 					"longitude",
-					[-123, -120], // TODO: Get min/max longitude from api
+					[longitude - 0.5 , longitude + 0.5],
 					"range",
 				)
 			case ACTION_KEYS.LOAD_DATASET:
