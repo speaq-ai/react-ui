@@ -26,6 +26,7 @@ export default class ActionProcessor {
     CHANGE_VIEW_MODE: "ChangeViewMode",
     VIEW_ACTION: "ViewAction",
     GOTO_ACTION: "GotoAction",
+    LOCATION_FILTER: "LocationFilter",
     ADD_FILTER_DATETIME_UNARY: "AddDatetimeFilterUnary",
     ADD_FILTER_DATETIME_BINARY: "AddDatetimeFilterBinary",
   };
@@ -63,6 +64,8 @@ export default class ActionProcessor {
       year: "year",
       magnitude: "magnitude",
       depth: "depth",
+      latitude: "latitude",
+      longitude: "longitude",
       "availability per year": "availability_365",
       "host listing count": "calculated_host_listings_count",
       "reviews per month": "reviews_per_month",
@@ -143,6 +146,32 @@ export default class ActionProcessor {
   process = async res => {
     const { ACTION_KEYS } = ActionProcessor;
     switch (res.action) {
+      case ACTION_KEYS.ADD_FILTER:
+        return await this._executeOnDataset(
+          this._addFilter,
+          res.variables.dataset_name,
+          res.variables.filter_field,
+          res.variables.sys_number,
+          res.variables.filter_comparison
+        );
+
+      case ACTION_KEYS.LOCATION_FILTER:
+        let [latitude, longitude] = res.variables.location;
+
+        await this._executeOnDataset(
+          this._addFilter,
+          res.variables.dataset_name,
+          "latitude",
+          [latitude - 0.2, latitude + 0.2],
+          "range"
+        );
+        return await this._executeOnDataset(
+          this._addFilter,
+          res.variables.dataset_name,
+          "longitude",
+          [longitude - 0.2, longitude + 0.2],
+          "range"
+        );
       case ACTION_KEYS.ADD_FILTER_DATETIME_UNARY:
         return await this._executeOnDataset(
           this._addDatetimeFilterUnary,
@@ -158,15 +187,6 @@ export default class ActionProcessor {
           res.variables.date_start,
           res.variables.date_end
         );
-      case ACTION_KEYS.ADD_FILTER:
-        return await this._executeOnDataset(
-          this._addFilter,
-          res.variables.dataset_name,
-          res.variables.filter_field,
-          res.variables.sys_number,
-          res.variables.filter_comparison
-        );
-
       case ACTION_KEYS.LOAD_DATASET:
         return this._loadDataset(res.variables.dataset_name);
 
@@ -232,6 +252,9 @@ export default class ActionProcessor {
       case "equal":
         await this._setEqFilter(filterId, value);
         break;
+      case "range":
+        await this._setRangeFilter(filterId, value[0], value[1]);
+        break;
       default:
         break;
     }
@@ -288,6 +311,10 @@ export default class ActionProcessor {
     this._dispatch(
       setFilter(filterId, "value", [Number.MIN_SAFE_INTEGER, value])
     );
+  };
+
+  _setRangeFilter = async (filterId, min, max) => {
+    this._dispatch(setFilter(filterId, "value", [min, max]));
   };
 
   _setEqFilter = async (filterId, value) => {
