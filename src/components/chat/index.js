@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { sendMessage } from "@/utils/speaq-api";
 import { Send } from "react-feather";
 import ActionProcessor from "./action-processor";
-
+import { playBase64Audio } from "@/utils/audio";
 export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -161,14 +161,19 @@ export class Chat extends Component {
     });
     this._addMessagesToState(dialogue, { remove: dialogue.length });
 
-    if (outputAsSpeech) {
-      this.playBase64Audio(res.speech);
-    }
     const responses = await actionProcessor.process(res);
     const messages = responses.map(response => ({
       text: response,
       isResponse: true,
     }));
+
+    // only play watson audio if there was no error message raised
+    if (!messages.length) {
+      if (outputAsSpeech) {
+        playBase64Audio(res.speech);
+      }
+    }
+
     messages.length &&
       (await this._addMessagesToState(messages, { remove: 1 }));
     if (this.responseContainer) {

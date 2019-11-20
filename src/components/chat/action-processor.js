@@ -258,7 +258,7 @@ export default class ActionProcessor {
       default:
         break;
     }
-    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+    return []; //[ActionProcessor.RESPONSES.SUCCESS_FILTER];
   };
 
   _addDatetimeFilterUnary = async (dataset, comparator, date) => {
@@ -280,7 +280,7 @@ export default class ActionProcessor {
         );
     }
     await this._dispatch(setFilter(filterId, "value", range));
-    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+    return []; // [ActionProcessor.RESPONSES.SUCCESS_FILTER];
   };
 
   _addDatetimeFilterBinary = async (
@@ -298,7 +298,7 @@ export default class ActionProcessor {
         moment(endDate).valueOf(),
       ])
     );
-    return [ActionProcessor.RESPONSES.SUCCESS_FILTER];
+    return []; //[ActionProcessor.RESPONSES.SUCCESS_FILTER];
   };
 
   _setGtFilter = async (filterId, value) => {
@@ -323,7 +323,7 @@ export default class ActionProcessor {
 
   _clearDataset = dataset => {
     this._dispatch(removeDataset(dataset));
-    return [ActionProcessor.RESPONSES.SUCCESS_CLEAR];
+    return []; //[ActionProcessor.RESPONSES.SUCCESS_CLEAR];
   };
 
   _loadDataset(datasetName) {
@@ -377,7 +377,7 @@ export default class ActionProcessor {
         break;
     }
 
-    return [ActionProcessor.RESPONSES.SUCCESS_CHANGE_VIEW];
+    return []; //[ActionProcessor.RESPONSES.SUCCESS_CHANGE_VIEW];
   };
 
   _executeViewAction(viewAction) {
