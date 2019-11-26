@@ -7,6 +7,7 @@ import { Chat } from "@/components/chat";
 import { AutoSizer } from "react-virtualized";
 import FloatingButton from "@/components/common/floating-button";
 import { AudioRecorder, blobToBase64 } from "@/utils/audio";
+import SelectorPopup from "@/components/selector";
 
 const MainContainer = styled.div`
 	display: flex;
@@ -33,7 +34,7 @@ const ButtonContainer = styled.div`
 	top: 10px;
 	left: 10px;
 	z-index: 100;
-	button {
+	> button {
 		margin-bottom: 8px;
 	}
 `;
@@ -126,6 +127,8 @@ export default class Visualizer extends Component {
 											icon="Mic"
 											activeIcon="Square"
 										/>
+
+										<SelectorPopup />
 									</ButtonContainer>
 									<KeplerGl
 										id="foo"
